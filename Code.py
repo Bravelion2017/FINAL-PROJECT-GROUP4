@@ -28,6 +28,11 @@ df.mean()
 df.dtypes
 df.shape
 df['University Rating'] = df['University Rating'].astype('category')
+
+#Checking for duplicates
+duplicate = df[df.duplicated()]
+print(duplicate)
+
 # this is a category column but since our dataset is not that big , time efficients is
 #not important also coding with a categorical sometimes its weird. I later changed it
 df.dtypes
@@ -95,20 +100,19 @@ df.columns
 
 
 ## CREATING A TRAINING SET AND A TESTING SET
+
 from sklearn.model_selection import train_test_split
 y = df['Chance of Admit'] #yes and yes
-df.columns
-
 ## Different Rating doesnt make sense since its numerical
+df.columns
 df.drop(['Rating 1','Rating 2', 'Rating 3', 'Rating 4','Rating 5'], axis = 1 , inplace=True)
-
 x = df.drop(['Chance of Admit'], axis = 1)## all the features you wanna give to determine if you have american dream
+
+df.head()
 
 pd.set_option("max_columns", None) # show all cols
 pd.set_option('max_colwidth', None) # show full width of showing cols
 pd.set_option("expand_frame_repr", False) #
-
-
 # The algorithm model that is going to learn from our data to make predictions
 # splitting the data 80:20 maybe perform validation scores to see testplit size
 X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.30)
@@ -116,9 +120,14 @@ X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.30)
 y_train.value_counts(normalize = True)
 
 y_test.value_counts(normalize = True)
-
 X_test.shape, y_test.shape
 X_train.shape,y_train.shape
+
+plt.scatter(X_train,y_train, label ='Training Data', color ='r') # x and y must be the same size, fix this
+plt.scatter(X_test,y_test, label = 'Testing Data', color = 'b')
+plt.title('Splitting the Data')
+plt.legend()
+plt.show()
 
 #Things to remember however: the more training data you have, the better your model will be.
 #The more testing data you have, the less variance
@@ -132,8 +141,9 @@ import matplotlib.pyplot as plt
 
 df.head(5)
 ## See which features are most important that the others.
-regressor = DecisionTreeRegressor(max_depth=6,random_state=10) ##changing the depth cause of our depth plot analysis
-clf = regressor.fit(x,y)
+regressor = DecisionTreeRegressor(random_state=10)
+
+clf = regressor.fit(X_train,y_train) ## DO IT ONLY ON YOUR TRAINING SET
 clf.get_params()
 feature_names = x.columns
 clf.feature_importances_
@@ -146,10 +156,6 @@ features = list(feature_importance[feature_importance[0]>0].index)
 feature_importance.plot(kind='bar')
 plt.show()
 
-
-regressor.score(X_train,y_train) ##accuracy on the training set, which we will use to train our model, good score
-regressor.score(X_test,y_test)  ## accuracy on the test set is the same which is good
-regressor.predict(X_test)
 
 
 train_accuracy  = []
@@ -174,6 +180,22 @@ plt.ylabel('Performance')
 plt.legend()
 plt.show()
 
+dt = DecisionTreeRegressor(max_depth=6,random_state=10)##changing the depth cause of our depth plot analysis
+ ## accuracy on the test set is the same which is good
+dt.fit(X_train,y_train)
+dt.score(X_test,y_test)
+dt.score(X_train,y_train)
+
+
+from sklearn.metrics import accuracy_score, mean_squared_error ## mean squared error regression to check acc
+X_test
+pred = dt.predict(X_test)
+pred
+y_test
+mean_squared_error(pred,y_test) ## the smallers the better
+
+
+
 df.columns
 import os
 from sklearn import tree
@@ -182,7 +204,7 @@ from pydotplus import graph_from_dot_data
 import webbrowser
 
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
-decision_tree = export_graphviz(clf, out_file=None, feature_names = X_train.columns,filled = True , max_depth= 4)
+decision_tree = export_graphviz(dt, out_file=None, feature_names = X_train.columns,filled = True , max_depth= 4)
 # proffesor settings for the decision tree dot_data = export_graphviz(clf_gini, filled=True, rounded=True, class_names=class_names, feature_names=data.iloc[:, 1:5].columns, out_file=None)
 graph = graph_from_dot_data(decision_tree)
 graph.write_pdf("decision_tree_gini3.pdf")
@@ -192,10 +214,18 @@ webbrowser.open_new(r'decision_tree_gini3.pdf')
 
 from sklearn.linear_model import LinearRegression
 lr = LinearRegression()
+
 lr.fit(X_train,y_train) ## training on our dataset for linear regression
 lr.get_params()
+
 lr.score(X_test,y_test)
+#lr.score(X_train,y_train) doesnt make sense, only need accuracy against the testing dataset
+
+
+X_test
 pred = lr.predict(X_test)
+mean_squared_error(pred,y_test)
+
 pred.shape
 type(pred)
 y_test.shape
@@ -228,6 +258,9 @@ cross_val_score(DecisionTreeRegressor(),x,y)
 
 
 # ## BELOW DOESNT WORK, dont delete please
+
+#final_clf.score(X_train,y_train) ##accuracy on the training set, which we will use to train our model, good score
+#final_clf.score(X_test,y_test)  ## accuracy on the test set is the same which is good
 # dt_model = DecisionTreeClassifier()
 # dt_model.get_params()
 # dt_model.fit(X_train, y_train) # error The Y variable must be the classification class
