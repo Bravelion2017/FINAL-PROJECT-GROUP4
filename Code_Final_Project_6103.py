@@ -29,7 +29,24 @@ pd.set_option("expand_frame_repr", False) #
 #--
 
 #Importing Dataset
-per=pd.read_csv("Admission_Predict.csv")
+##importing our datset from kaggle api chnage the username and kaggle key to your key if you dont want to use my key which is added to the gitup
+os.environ['KAGGLE_USERNAME'] = 'koyanjo'
+os.environ['KAGGLE_KEY'] = '33bfba07e0815efc297a1a4488dbe6a3'
+
+from kaggle.api.kaggle_api_extended import KaggleApi
+
+dataset = 'mohansacharya/graduate-admissions'
+path = 'datasets/graduate-admissions'
+
+api = KaggleApi()
+api.authenticate()
+
+api.dataset_download_files(dataset, path)
+
+api.dataset_download_file(dataset, 'Admission_Predict.csv', path)
+# use this if you the file is sql ->api.dataset_download_file(dataset, 'database.sqlite', path)
+
+per = pd.read_csv("datasets/graduate-admissions/Admission_Predict.csv")
 print(per.head())
 print(per.describe())
 per_new= per.copy() #DF copy
