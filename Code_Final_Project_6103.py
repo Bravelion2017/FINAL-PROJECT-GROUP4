@@ -93,47 +93,24 @@ x,y = per_new.drop(['Chance of Admit','GRE Groups','TOEFL Groups'],axis=1), per_
 X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.20)
 
 # Cross Validation to identify best models
-models = ['Linear Regression','Decision Tree Regression','Random Forest Regression','Gradient Boosting Regression','Ada Boosting Regression',
-          'Extra Tree Regression','K-Neighbors Regression','Support Vector Regression']
-linear = LinearRegression() ;l_score = cross_val_score(linear,x,y).mean()
-dt = DecisionTreeRegressor() ;dt_score = cross_val_score(dt,x,y).mean()
-dt.get_params()
-rf = RandomForestRegressor();rf_score = cross_val_score(rf,x,y).mean()
-gbr = GradientBoostingRegressor();gbr_score = cross_val_score(gbr,x,y).mean()
-abr = AdaBoostRegressor();abr_score = cross_val_score(abr,x,y).mean()
-etr = ExtraTreesRegressor();etr_score = cross_val_score(etr,x,y).mean()
-knr = KNeighborsRegressor();knr_score = cross_val_score(knr,x,y).mean()
-svr = SVR();svr_score = cross_val_score(svr,x,y).mean()
+models = ['Linear Reg','Decision Tree Reg','Random Forest Reg','Gradient Boosting Reg','Ada Boosting Reg',
+          'Extra Tree Reg','K-Neighbors Reg','Support Vector Reg']
 
-scores = [l_score,dt_score,rf_score,gbr_score,abr_score,etr_score,knr_score,svr_score]
-scores = [int(round(n,2)*100) for n in scores]
-dt2 = dict(zip(models,scores))
-dt = pd.DataFrame(list(dt2.items()), columns = ['Model','Scores'])
-g = sns.barplot(x= 'Scores',y ='Model',edgecolor ='0.1', data = dt, order = dt.sort_values('Scores', ascending = False).Model)
-#function below is copy from the internet to show values, we could also upgrade to matplotlib 3.4 to show values
-def show_values_on_bars(axs, h_v="v", space=0.4):
-    def _show_on_single_plot(ax):
-        if h_v == "v":
-            for p in ax.patches:
-                _x = p.get_x() + p.get_width() / 2
-                _y = p.get_y() + p.get_height()
-                value = int(p.get_height())
-                ax.text(_x, _y, value, ha="center")
-        elif h_v == "h":
-            for p in ax.patches:
-                _x = p.get_x() + p.get_width() + float(space)
-                _y = p.get_y() + p.get_height()
-                value = int(p.get_width())
-                ax.text(_x, _y, value, ha="left")
+mod= [LinearRegression(),DecisionTreeRegressor(max_depth=5),RandomForestRegressor(n_estimators = 50),
+      GradientBoostingRegressor(),AdaBoostRegressor(),ExtraTreesRegressor(),KNeighborsRegressor(),SVR()]
+def crossval(model_objs,x,y,mod_names_list):
+    global df_cv
+    score=[]
+    for i in model_objs:
+        score.append(cross_val_score(i,x,y).mean())
+    dic= dict(zip(mod_names_list,score))
+    df_cv=pd.DataFrame(list(dic.items()),columns=['Model','Score'])
 
-    if isinstance(axs, np.ndarray):
-        for idx, ax in np.ndenumerate(axs):
-            _show_on_single_plot(ax)
-    else:
-        _show_on_single_plot(axs) ## copy from the interne
-show_values_on_bars(g,'h',0.6)
-plt.tight_layout()
-plt.show()
+crossval(mod,x,y,models)
+crosval_df=df_cv.copy()
+crosval_df.sort_values(by='Score',inplace=True)
+sns.barplot(y=crosval_df.Model, x=crosval_df.Score, data=df_cv, orient='h'),plt.tight_layout(),plt.show()
+
 
 #Fitting Random Forest
 rf = RandomForestRegressor()
