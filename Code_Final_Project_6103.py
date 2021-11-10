@@ -96,9 +96,9 @@ X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.20)
 models = ['Linear Regression','Decision Tree Regression','Random Forest Regression','Gradient Boosting Regression','Ada Boosting Regression',
           'Extra Tree Regression','K-Neighbors Regression','Support Vector Regression']
 linear = LinearRegression() ;l_score = cross_val_score(linear,x,y).mean()
-dt = DecisionTreeRegressor(max_depth=5) ;dt_score = cross_val_score(dt,x,y).mean()
+dt = DecisionTreeRegressor() ;dt_score = cross_val_score(dt,x,y).mean()
 dt.get_params()
-rf = RandomForestRegressor(n_estimators = 50);rf_score = cross_val_score(rf,x,y).mean()
+rf = RandomForestRegressor();rf_score = cross_val_score(rf,x,y).mean()
 gbr = GradientBoostingRegressor();gbr_score = cross_val_score(gbr,x,y).mean()
 abr = AdaBoostRegressor();abr_score = cross_val_score(abr,x,y).mean()
 etr = ExtraTreesRegressor();etr_score = cross_val_score(etr,x,y).mean()
@@ -136,12 +136,50 @@ plt.tight_layout()
 plt.show()
 
 #Fitting Random Forest
+rf = RandomForestRegressor()
+# Number of trees in random forest
+n_estimators = list(np.arange(10,100,10))
+# Criteriion for the random forest
+criterion = ['mse', 'mae'] ## if you put this as a parameters , takes a long time to run and performance goes down
+# Number of features to consider at every split
+max_features = ['auto', 'sqrt']
+# Maximum number of levels in tree
+max_depth = list(np.arange(4,12))
+# Minimum number of samples required to split a node
+min_samples_split = [2, 5]
+# Minimum number of samples required at each leaf node
+min_samples_leaf = [1, 2]
+# Method of selecting samples for training each tree
+bootstrap = [True, False]
+rf_param = {'n_estimators': n_estimators,
+               'max_features': max_features,
+               'max_depth': max_depth,
+               'min_samples_split': min_samples_split,
+               'min_samples_leaf': min_samples_leaf,
+               'bootstrap': bootstrap}
+# Using RandomizedSearch CV to look for the best parameter for our Random Forest
+from sklearn.model_selection import RandomizedSearchCV
+rf_improve = RandomizedSearchCV(estimator = rf, param_distributions = rf_param,n_iter=100,cv = 5)
+rf_improve.fit(X_train,y_train)
+rf_improve.score(X_test,y_test)
+rf_improve.best_params_
+#After performing the randomized search we got the parameters it got and put it in our random forest method
+rf = RandomForestRegressor(n_estimators= 80,min_samples_split = 2,min_samples_leaf = 1,max_features = 'sqrt',max_depth = 10,bootstrap = True)
+rf.fit(X_train,y_train)
+rf.score(X_test,y_test)
+y_pred = rf.predict(X_test)
+from sklearn import metrics
+print(f'Random Forest Regressor Score: {np.round(rf.score(X_test,y_test),2)*100}%')
+print('Root Mean Squared Error:',np.sqrt(mean_squared_error(y_test,y_pred)))
+print('Mean Squared Error:', mean_squared_error(y_test,y_pred))
 
+##Putting our Randomizedsesearch into a datafram to check any trends
+results = pd.DataFrame(rf_improve.cv_results_)
+results[['params','mean_test_score','rank_test_score']].sort_values('rank_test_score')
 
 # Fitting Decision Tree to Training set
 regressor = DecisionTreeRegressor(max_depth=5,random_state=10) ##changing the depth because of our depth plot analysis
 regressor.fit(X_train,y_train)
-
 # Feature importance
 feature_names = x.columns
 feature_importance = pd.DataFrame(regressor.feature_importances_, index = feature_names)
@@ -150,7 +188,6 @@ print(feature_importance.sort_values)
 features = list(feature_importance.index)
 feature_importance.plot(kind='bar'); plt.show()
 feature_importance.drop(['CGPA'],axis=0).plot(kind='bar'); plt.show()
-
 #Prediction
 pred=regressor.predict(X_test)
 test_pred=pd.DataFrame({'Actual':y_test, 'Predicted':pred})
@@ -160,8 +197,6 @@ sns.kdeplot(data= test_pred,x='Predicted',label ='Predicted', color = 'teal')
 plt.xlabel("Chance of Admit")
 plt.legend()
 plt.show()
-
-
 #checking the different settings on the decision tree, first depth
 train_accuracy  = []
 test_accuracy = []
@@ -200,7 +235,7 @@ print('Root Mean Squared Error:', np.round(np.sqrt(metrics.mean_squared_error(y_
 
 #Decision Tree's Tree
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
-decision_tree = export_graphviz(regressor, out_file=None, feature_names = X_train.columns,filled = True , max_depth= 4)
+decision_tree = export_graphviz(regressor, out_file=None, feature_names = X_train.columns,filled = True )
 # proffesor settings for the decision tree dot_data = export_graphviz(clf_gini, filled=True, rounded=True, class_names=class_names, feature_names=data.iloc[:, 1:5].columns, out_file=None)
 graph = graph_from_dot_data(decision_tree)
 graph.write_pdf("decision_tree_gini3.pdf")
@@ -210,14 +245,11 @@ webbrowser.open_new(r'decision_tree_gini3.pdf')
 lr = LinearRegression()
 lr.fit(X_train,y_train) ## training on our dataset for linear regression
 lr.get_params()
-
 #Linear Regression Coefficients
 lr_coef=pd.DataFrame({'features':x.columns,'coefficients':lr.coef_})
-
 #Linear Regression Prediction
 pred2 = lr.predict(X_test)
 lr_pred = pd.DataFrame({'y_test':y_test,'y_pred':pred2})
-
 sns.kdeplot(data=lr_pred,x='y_test',label ='Actual', color = 'olive')
 sns.kdeplot(data= lr_pred,x='y_pred',label ='Predicted', color = 'teal')
 sns.scatterplot(lr_pred['y_test'],lr_pred['y_pred'],color='blue')
@@ -238,8 +270,6 @@ print(f'Linear Regression Model Score: {np.round(score2,2)}%')
 # #plt.hlines(y=0,xmin=-10,xmax=10)
 # plt.legend((train,test),('Training','Test'),loc='lower left')
 # plt.title("Residual Plots")
-#Metric
-
 # DONT delete this
 # sns.scatterplot(y_test,pred,color='green')
 # plt.xlabel("Actual Chance of Admit")
