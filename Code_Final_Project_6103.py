@@ -8,14 +8,19 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from sklearn.linear_model import LinearRegression,LogisticRegression
+from sklearn.tree import DecisionTreeRegressor,DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor,RandomForestClassifier
+from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostRegressor,AdaBoostClassifier
+from sklearn.ensemble import ExtraTreesRegressor,ExtraTreesClassifier
+from sklearn.neighbors import KNeighborsRegressor,KNeighborsClassifier
+from sklearn.svm import SVR,SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score,mean_squared_error
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
 from sklearn.datasets import make_regression
-from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestRegressor
 from sklearn import tree
 from sklearn.tree import export_graphviz
 import os
@@ -63,7 +68,8 @@ for e in range(1,7):
 
 #Checking for Outliers for categoricals
 
-
+per_new['University Rating'].unique()
+per_new['Research'].unique()
 
 #Visualization
 sns.heatmap(per.corr(),annot=True,cmap='summer')
@@ -85,10 +91,56 @@ x,y = per_new.drop(['Chance of Admit','GRE Groups','TOEFL Groups'],axis=1), per_
 # The algorithm model that is going to learn from our data to make predictions
 # splitting the data 80:20
 X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.20)
+
+# Cross Validation to identify best models
+models = ['Linear Regression','Decision Tree Regression','Random Forest Regression','Gradient Boosting Regression','Ada Boosting Regression',
+          'Extra Tree Regression','K-Neighbors Regression','Support Vector Regression']
+linear = LinearRegression() ;l_score = cross_val_score(linear,x,y).mean()
+dt = DecisionTreeRegressor(max_depth=5) ;dt_score = cross_val_score(dt,x,y).mean()
+dt.get_params()
+rf = RandomForestRegressor(n_estimators = 50);rf_score = cross_val_score(rf,x,y).mean()
+gbr = GradientBoostingRegressor();gbr_score = cross_val_score(gbr,x,y).mean()
+abr = AdaBoostRegressor();abr_score = cross_val_score(abr,x,y).mean()
+etr = ExtraTreesRegressor();etr_score = cross_val_score(etr,x,y).mean()
+knr = KNeighborsRegressor();knr_score = cross_val_score(knr,x,y).mean()
+svr = SVR();svr_score = cross_val_score(svr,x,y).mean()
+
+scores = [l_score,dt_score,rf_score,gbr_score,abr_score,etr_score,knr_score,svr_score]
+scores = [int(round(n,2)*100) for n in scores]
+dt2 = dict(zip(models,scores))
+dt = pd.DataFrame(list(dt2.items()), columns = ['Model','Scores'])
+g = sns.barplot(x= 'Scores',y ='Model',edgecolor ='0.1', data = dt, order = dt.sort_values('Scores', ascending = False).Model)
+#function below is copy from the internet to show values, we could also upgrade to matplotlib 3.4 to show values
+def show_values_on_bars(axs, h_v="v", space=0.4):
+    def _show_on_single_plot(ax):
+        if h_v == "v":
+            for p in ax.patches:
+                _x = p.get_x() + p.get_width() / 2
+                _y = p.get_y() + p.get_height()
+                value = int(p.get_height())
+                ax.text(_x, _y, value, ha="center")
+        elif h_v == "h":
+            for p in ax.patches:
+                _x = p.get_x() + p.get_width() + float(space)
+                _y = p.get_y() + p.get_height()
+                value = int(p.get_width())
+                ax.text(_x, _y, value, ha="left")
+
+    if isinstance(axs, np.ndarray):
+        for idx, ax in np.ndenumerate(axs):
+            _show_on_single_plot(ax)
+    else:
+        _show_on_single_plot(axs) ## copy from the interne
+show_values_on_bars(g,'h',0.6)
+plt.tight_layout()
+plt.show()
+
+#Fitting Random Forest
+
+
 # Fitting Decision Tree to Training set
 regressor = DecisionTreeRegressor(max_depth=5,random_state=10) ##changing the depth because of our depth plot analysis
 regressor.fit(X_train,y_train)
-
 
 # Feature importance
 feature_names = x.columns
@@ -175,6 +227,9 @@ plt.show()
 score2=lr.score(X_test,y_test)
 print(f'Linear Regression Model Score: {np.round(score2,2)}%')
 
+
+
+
 # THIS DOESNT WORK!
 #Residuals plot is used to analyze the variance of the error of the regressor.
 #Residual Plot- Randomly scattered shows our linear model is good otherwise a non-linear model is preferred
@@ -184,7 +239,6 @@ print(f'Linear Regression Model Score: {np.round(score2,2)}%')
 # plt.legend((train,test),('Training','Test'),loc='lower left')
 # plt.title("Residual Plots")
 #Metric
-
 
 # DONT delete this
 # sns.scatterplot(y_test,pred,color='green')

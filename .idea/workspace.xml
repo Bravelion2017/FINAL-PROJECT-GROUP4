@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5f092a3f-e73e-401b-b984-ae9823d8adcf" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/FINAL-PROJECT-GROUP4.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FINAL-PROJECT-GROUP4.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code_update_11_7_2021.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code_Final_Project_6103.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/decision_tree_gini3.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/decision_tree_gini3.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Code_Final_Project_6103.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code_Final_Project_6103.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +41,7 @@
       <option name="presentableId" value="Default" />
       <updated>1636465435180</updated>
       <workItem from="1636465449537" duration="96000" />
-      <workItem from="1636465567929" duration="5455000" />
+      <workItem from="1636465567929" duration="15241000" />
     </task>
     <servers />
   </component>
