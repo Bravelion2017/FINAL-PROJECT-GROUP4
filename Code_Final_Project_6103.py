@@ -92,12 +92,13 @@ x,y = per_new.drop(['Chance of Admit','GRE Groups','TOEFL Groups'],axis=1), per_
 # splitting the data 80:20
 X_train, X_test, y_train, y_test = train_test_split(x,y, test_size = 0.20)
 
-# Cross Validation to identify best models
+# Cross Validation to identify best model CONSTANT
 models = ['Linear Reg','Decision Tree Reg','Random Forest Reg','Gradient Boosting Reg','Ada Boosting Reg',
           'Extra Tree Reg','K-Neighbors Reg','Support Vector Reg']
 
 mod= [LinearRegression(),DecisionTreeRegressor(max_depth=5),RandomForestRegressor(n_estimators = 50),
       GradientBoostingRegressor(),AdaBoostRegressor(),ExtraTreesRegressor(),KNeighborsRegressor(),SVR()]
+
 def crossval(model_objs,x,y,mod_names_list):
     global df_cv
     score=[]
@@ -110,6 +111,23 @@ crossval(mod,x,y,models)
 crosval_df=df_cv.copy()
 crosval_df.sort_values(by='Score',inplace=True)
 sns.barplot(y=crosval_df.Model, x=crosval_df.Score, data=df_cv, orient='h'),plt.tight_layout(),plt.show()
+
+
+## america dream, its most likely get accepted into a good university
+def myfunc(x,y):
+    if x <= 0.75 and y > 2: ## insert criteria here.
+        return 1
+    else:
+        return 0
+#df['American Dream'] = df.apply(lambda x: myfunc(x['Chance of Admit'],x['University Rating']), axis = 1)
+
+# Cross Validation to identity best models CATEGORICAL
+
+models2 = ['Logical Regression','Decision Tree Class','Random Forest Class','Gradient Boosting Class','Ada Boosting Class',
+          'Extra Tree Class','K-Neighbors Class','Support Vector Class']
+
+mod2 = [LogisticRegression(),DecisionTreeClassifier(max_depth=5),RandomForestClassifier(n_estimators = 50),
+      GradientBoostingClassifier(),AdaBoostClassifier(),ExtraTreesClassifier(),KNeighborsClassifier(),SVC()]
 
 
 #Fitting Random Forest
