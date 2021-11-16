@@ -163,6 +163,8 @@ rf = RandomForestRegressor(n_estimators= 80,min_samples_split = 2,min_samples_le
 rf.fit(X_train,y_train)
 rf.score(X_test,y_test)
 y_pred = rf.predict(X_test)
+#rf.predict_proba(X_test)
+
 from sklearn import metrics
 print(f'Random Forest Regressor Score: {np.round(rf.score(X_test,y_test),2)*100}%')
 print('Root Mean Squared Error:',np.sqrt(mean_squared_error(y_test,y_pred)))
@@ -171,6 +173,16 @@ print('Mean Squared Error:', mean_squared_error(y_test,y_pred))
 ##Putting our Randomizedsesearch into a datafram to check any trends
 results = pd.DataFrame(rf_improve.cv_results_)
 results[['params','mean_test_score','rank_test_score']].sort_values('rank_test_score')
+
+## Feature Importance for our Random Forest
+feature_names = x.columns
+c = ['red', 'yellow', 'black', 'blue', 'orange','green','purple']
+importance_Rf = pd.DataFrame(rf.feature_importances_, index = feature_names)
+#importance_Rf.plot(kind='bar',color =c); plt.show()
+plt.bar(x=feature_names,height=rf.feature_importances_, color = c)
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.show()
 
 # Fitting Decision Tree to Training set
 regressor = DecisionTreeRegressor(max_depth=5,random_state=10) ##changing the depth because of our depth plot analysis
@@ -181,8 +193,14 @@ feature_importance = pd.DataFrame(regressor.feature_importances_, index = featur
 print(feature_importance.sort_values)
 ## feature importance plot
 features = list(feature_importance.index)
-feature_importance.plot(kind='bar'); plt.show()
-feature_importance.drop(['CGPA'],axis=0).plot(kind='bar'); plt.show()
+c = ['red', 'yellow', 'black', 'blue', 'orange','green','purple']
+importance_df = pd.DataFrame(regressor.feature_importances_, index = feature_names)
+plt.bar(x=feature_names,height=regressor.feature_importances_, color = c)
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.show()
+#feature_importance.plot(kind='bar'); plt.show()
+#feature_importance.drop(['CGPA'],axis=0).plot(kind='bar'); plt.show()
 #Prediction
 pred=regressor.predict(X_test)
 test_pred=pd.DataFrame({'Actual':y_test, 'Predicted':pred})
@@ -192,6 +210,8 @@ sns.kdeplot(data= test_pred,x='Predicted',label ='Predicted', color = 'teal')
 plt.xlabel("Chance of Admit")
 plt.legend()
 plt.show()
+
+
 #checking the different settings on the decision tree, first depth
 train_accuracy  = []
 test_accuracy = []
