@@ -46,6 +46,16 @@ from pydotplus import graph_from_dot_data
 import webbrowser
 #---
 font_size_window = 'font-size:15px'
+os.environ['KAGGLE_USERNAME'] = 'koyanjo'
+os.environ['KAGGLE_KEY'] = '33bfba07e0815efc297a1a4488dbe6a3'
+
+from kaggle.api.kaggle_api_extended import KaggleApi
+dataset = 'mohansacharya/graduate-admissions'
+path = 'datasets/graduate-admissions'
+api = KaggleApi()
+api.authenticate()
+api.dataset_download_files(dataset, path)
+api.dataset_download_file(dataset, 'Admission_Predict.csv', path)
 #---
 
 class CorrelationPlot(QMainWindow):
@@ -192,16 +202,14 @@ class CorrelationPlot(QMainWindow):
 class AdmitGraphs(QMainWindow):
     #::---------------------------------------------------------
     # This class crates a canvas with a plot to show the relation
-    # from each feature in the dataset with the happiness score
+    # from each feature in the dataset with the Admission Chance
     # methods
-    #    _init_
-    #   update
     #::---------------------------------------------------------
     send_fig = pyqtSignal(str)
 
     def __init__(self):
         #::--------------------------------------------------------
-        # Crate a canvas with the layout to draw a jointplot
+        # Create a canvas with the layout to draw a scatterplot
         # The layout sets all the elements and manage the changes
         # made on the canvas
         #::--------------------------------------------------------
@@ -343,6 +351,7 @@ class App(QMainWindow):
         #::-------------------------------------------------
         self.setWindowTitle(self.Title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowIcon(QIcon('pty.png'))
 
         #::-----------------------------
         # Create the menu bar
@@ -369,52 +378,23 @@ class App(QMainWindow):
 
         #::----------------------------------------
         # EDA analysis
-        # Creates the actions for the EDA Analysis item
-        # Initial Assesment : Histogram about the level of happiness in 2017
-        # Happiness Final : Presents the correlation between the index of happiness and a feature from the datasets.
-        # Correlation Plot : Correlation plot using all the dims in the datasets
         #::----------------------------------------
 
-        EDA1Button = QAction(QIcon('analysis.png'),'Distribution', self)
+        EDA1Button = QAction(QIcon('pty.png'),'Distribution', self)
         EDA1Button.setStatusTip('Distribution of Chance of Admission')
         EDA1Button.triggered.connect(self.EDA1)
         EDAMenu.addAction(EDA1Button)
 
-        EDA2Button = QAction(QIcon('analysis.png'), 'Scatter Plots', self)
+        EDA2Button = QAction(QIcon('pty.png'), 'Scatter Plots', self)
         EDA2Button.setStatusTip('Twain features relationship')
         EDA2Button.triggered.connect(self.EDA2)
         EDAMenu.addAction(EDA2Button)
 
-        EDA4Button = QAction(QIcon('analysis.png'), 'Heatmap Plot', self)
+        EDA4Button = QAction(QIcon('pty.png'), 'Heatmap Plot', self)
         EDA4Button.setStatusTip('Features Correlation Plot')
         EDA4Button.triggered.connect(self.EDA4)
         EDAMenu.addAction(EDA4Button)
 
-
-        #::--------------------------------------------------
-        # ML Models for prediction
-        # There are two models
-        #       Decision Tree
-        #       Random Forest
-        #::--------------------------------------------------
-        # Decision Tree Model
-        #::--------------------------------------------------
-
-        # MLModel1Button =  QAction(QIcon(), 'Decision Tree Gini', self)
-        # MLModel1Button.setStatusTip('ML Algorithm with Gini ')
-        # MLModel1Button.triggered.connect(self.MLDT)
-
-        #::------------------------------------------------------
-        # Random Forest Classifier
-        #::------------------------------------------------------
-
-        # MLModel2Button = QAction(QIcon(), 'Random Forest Regression', self)
-        # MLModel2Button.setStatusTip('Random Forest Regression ')
-        # MLModel2Button.triggered.connect(self.MLRF)
-        #
-        # MLModelMenu.addAction(MLModel1Button)
-        # MLModelMenu.addAction(MLModel2Button)
-        #
         self.dialogs = list()
 
     def EDA1(self):
@@ -426,7 +406,7 @@ class App(QMainWindow):
         #::------------------------------------------------------
         dialog = CanvasWindow(self)
         dialog.m.plot()
-        dialog.m.ax.hist(y,bins=10, facecolor='blue', alpha=0.5)
+        dialog.m.ax.hist(y,bins=15,facecolor='green', alpha=0.5)
         dialog.m.ax.set_title('Frequency of Chance of Admission')
         dialog.m.ax.set_xlabel("Chance of Admission")
         dialog.m.ax.set_ylabel("Count of Students")
@@ -437,9 +417,7 @@ class App(QMainWindow):
 
     def EDA2(self):
         #::---------------------------------------------------------
-        # This function creates an instance of HappinessGraphs class
         # This class creates a graph using the features in the dataset
-        # happiness vrs the score of happiness
         #::---------------------------------------------------------
         dialog = AdmitGraphs()
         self.dialogs.append(dialog)
@@ -463,7 +441,7 @@ class App(QMainWindow):
     #     dialog = DecisionTree()
     #     self.dialogs.append(dialog)
     #     dialog.show()
-    #
+
     # def MLRF(self):
     #     #::-------------------------------------------------------------
     #     # This function creates an instance of the Random Forest Classifier Algorithm
@@ -489,7 +467,7 @@ def main():
 def data_admit():
     global per_new, x, y, features_list
     # Importing Dataset
-    per = pd.read_csv("Admission_Predict.csv")
+    per = pd.read_csv("datasets/graduate-admissions/Admission_Predict.csv")
     print(per.head())
     print(per.describe())
     per_new = per.copy()  # DF copy
