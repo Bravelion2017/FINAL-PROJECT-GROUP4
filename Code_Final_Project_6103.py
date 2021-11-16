@@ -197,7 +197,7 @@ c = ['red', 'yellow', 'black', 'blue', 'orange','green','purple']
 importance_Rf = pd.DataFrame(rf.feature_importances_, index = feature_names)
 #importance_Rf.plot(kind='bar',color =c); plt.show()
 plt.bar(x=feature_names,height=rf.feature_importances_, color = c)
-plt.xticks(rotation=90)
+plt.xticks(rotation=90) ## this is the new graph
 plt.tight_layout()
 plt.show()
 
