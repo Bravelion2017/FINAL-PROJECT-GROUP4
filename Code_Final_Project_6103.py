@@ -103,6 +103,11 @@ sns.boxplot(x=per_new['Chance of Admit'],whis=np.inf); plt.show()
 sns.boxplot(x=per_new['Research'],y=per_new['Chance of Admit'],hue=per_new['University Rating']); plt.show()
 #--As CGPA and GRE increases, chance of admission increases also.
 
+#American dream selector
+z=per_new.describe()
+z.iloc[:,-1]
+per['Admitted']=per.iloc[:,-1].apply(lambda x:0 if x<per.iloc[:,-1].mean() else 1)
+
 #Modeling
 x,y = per_new.drop(['Chance of Admit','GRE Groups','TOEFL Groups'],axis=1), per_new['Chance of Admit']
 # The algorithm model that is going to learn from our data to make predictions
