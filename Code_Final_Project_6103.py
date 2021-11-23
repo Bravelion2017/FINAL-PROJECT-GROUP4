@@ -185,6 +185,7 @@ rf = RandomForestRegressor(n_estimators= 80,min_samples_split = 2,min_samples_le
 rf.fit(X_train,y_train)
 rf.score(X_test,y_test)
 y_pred = rf.predict(X_test)
+
 #rf.predict_proba(X_test)
 
 from sklearn import metrics
@@ -275,13 +276,50 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
 decision_tree = export_graphviz(regressor, out_file=None, feature_names = X_train.columns,filled = True )
 # proffesor settings for the decision tree dot_data = export_graphviz(clf_gini, filled=True, rounded=True, class_names=class_names, feature_names=data.iloc[:, 1:5].columns, out_file=None)
 graph = graph_from_dot_data(decision_tree)
-graph.write_pdf("decision_tree_gini3.pdf")
-webbrowser.open_new(r'decision_tree_gini3.pdf')
+graph.write_pdf("decision_tree_gini.pdf")
+webbrowser.open_new(r'decision_tree_gini.pdf')
 
-# LinearRegression
+# LinearRegression with SCALING
+from sklearn.preprocessing import MinMaxScaler
+
 lr = LinearRegression()
-lr.fit(X_train,y_train) ## training on our dataset for linear regression
+scaler = MinMaxScaler()
+scaler.fit(X_train.iloc[:,[0,1,3,4,5]])
+scaled_data = scaler.transform(X_train.iloc[:,[0,1,3,4,5]]) #transforming only the numerical columns
+df = pd.DataFrame(scaled_data, columns=['GREScore' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
+getting_dummies = pd.get_dummies(X_train,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
+getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
+
+new_X_train =  pd.concat([df.reset_index(drop=True),getting_dummies.reset_index(drop=True)], axis=1) #reseting the index to concat two dataframe
+
+scaler.fit(X_test.iloc[:,[0,1,3,4,5]])
+scaled_data = scaler.transform(X_test.iloc[:,[0,1,3,4,5]]) #transforming only the numerical columns
+df = pd.DataFrame(scaled_data, columns=['GREScore' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
+getting_dummies = pd.get_dummies(X_test,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
+getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
+new_X_test =  pd.concat([df.reset_index(drop=True),getting_dummies.reset_index(drop=True)], axis=1)
+
+new_y_train = scaler.fit_transform(y_train.values.reshape(-1,1))
+new_y_test = scaler.fit_transform(y_test.values.reshape(-1,1))
+
+lr.fit(new_X_train,new_y_train)
+lr.score(new_X_test,new_y_test)
+
+importances = pd.DataFrame(data={
+    'Attribute': new_X_train.columns,
+    'Importance': lr.coef_[0]
+}) #this was copy from the internet to show the coefficients
+importances = importances.sort_values(by='Importance', ascending=False)
+plt.bar(x=importances['Attribute'], height=importances['Importance'], color='#087E8B')
+plt.title('Feature importances obtained from coefficients', size=20)
+plt.xticks(rotation='vertical')
+plt.show()
+
+
+## Linear Regression without SCALING
+lr.fit(X_train,y_train)
 lr.get_params()
+
 #Linear Regression Coefficients
 lr_coef=pd.DataFrame({'features':x.columns,'coefficients':lr.coef_})
 #Linear Regression Prediction
