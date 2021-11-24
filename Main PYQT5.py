@@ -192,8 +192,8 @@ class CorrelationPlot(QMainWindow):
         vsticks1 = list(list_corr_features.columns)
         vsticks1 = vsticks + vsticks1
         res_corr = list_corr_features.corr()
-        self.ax1.matshow(res_corr, cmap= plt.cm.get_cmap('Blues', 14))
-        self.fig.colorbar(self.ax1.matshow(res_corr, cmap="summer"))
+        self.ax1.matshow(res_corr, cmap= plt.cm.get_cmap('autumn', 14))
+        #self.fig.colorbar(self.ax1.matshow(res_corr, cmap="summer"))
         self.ax1.set_yticklabels(vsticks1)
         self.ax1.set_xticklabels(vsticks1,rotation = 90)
 
@@ -686,31 +686,20 @@ class RandomForest(QMainWindow):
         self.txtR3.setText(str(np.round(self.mse*100, 4))+'%')
 
         # Feature importance
-        feature_names = self.list_corr_features.columns
+        feature_names = ['GRE', 'TOEFL','URating','SOP','LOR','CGPA','Research']
+        feature_imp = self.rf.feature_importances_
+
         feature_importance = pd.DataFrame(self.rf.feature_importances_, index=feature_names, columns=['score'])
         self.txtResults.appendPlainText(self.rf_pred_df.to_csv(sep="|", index=False))
         self.txtResults.updateGeometry()
-
+        c = ['red', 'yellow', 'black', 'blue', 'orange', 'green', 'purple']
         # ---test , try to do a barplot
         self.ax3.clear()
         # self.ax3.barh(feature_names,list(feature_importance['score']))
-        self.ax3.plot(feature_names, list(feature_importance['score']), 'o-', color='g')
-        self.ax3.tick_params(axis='x', labelsize=7)
-        self.ax3.set_aspect('auto')
+        self.ax3.bar(x=feature_names, height = feature_imp, color=c)
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
-        ## Feature Importance for our Random Forest
-        # feature_names = x.columns ##get the columns from the x
-        # c = ['red', 'yellow', 'black', 'blue', 'orange', 'green', 'purple']
-        # importance_Rf = pd.DataFrame(rf.feature_importances_, index=feature_names)
-        # # importance_Rf.plot(kind='bar',color =c); plt.show()
-        # plt.bar(x=feature_names, height=rf.feature_importances_, color=c)
-        # plt.xticks(rotation=90)  ## this is the new graph
-        # plt.tight_layout()
-        # plt.show()
 
-
-##test
 class cross(QMainWindow):
 
     send_fig = pyqtSignal(str)

@@ -762,3 +762,143 @@ class Regression(QMainWindow):
         self.ax1.legend(loc="lower right")
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
+
+
+class CorrelationPlot(QMainWindow):
+    #;:-----------------------------------------------------------------------
+    # This class creates a canvas to draw a correlation plot
+    # It presents all the features plus the happiness score
+    # the methods for this class are:
+    #   _init_
+    #   initUi
+    #   update
+    #::-----------------------------------------------------------------------
+    send_fig = pyqtSignal(str)
+
+    def __init__(self):
+        #::--------------------------------------------------------
+        # Initialize the values of the class
+        #::--------------------------------------------------------
+        super(CorrelationPlot, self).__init__()
+
+        self.Title = 'Correlation Plot'
+        self.initUi()
+
+    def initUi(self):
+        #::--------------------------------------------------------------
+        #  Creates the canvas and elements of the canvas
+        #::--------------------------------------------------------------
+        self.setWindowTitle(self.Title)
+        self.setStyleSheet(font_size_window)
+
+        self.main_widget = QWidget(self)
+
+        self.layout = QVBoxLayout(self.main_widget)
+
+        self.groupBox1 = QGroupBox('Correlation Plot Features')
+        self.groupBox1Layout= QGridLayout()
+        self.groupBox1.setLayout(self.groupBox1Layout)
+
+
+        self.feature0 = QCheckBox(features_list[0],self)
+        self.feature1 = QCheckBox(features_list[1],self)
+        self.feature2 = QCheckBox(features_list[2], self)
+        self.feature3 = QCheckBox(features_list[3], self)
+        self.feature4 = QCheckBox(features_list[4],self)
+        self.feature5 = QCheckBox(features_list[5],self)
+        self.feature6 = QCheckBox(features_list[6], self)
+        self.feature7 = QCheckBox(features_list[7], self)
+        self.feature0.setChecked(True)
+        self.feature1.setChecked(True)
+        self.feature2.setChecked(True)
+        self.feature3.setChecked(True)
+        self.feature4.setChecked(True)
+        self.feature5.setChecked(True)
+        self.feature6.setChecked(True)
+        self.feature7.setChecked(True)
+
+        self.btnExecute = QPushButton("Create Plot")
+        self.btnExecute.clicked.connect(self.update)
+
+        self.groupBox1Layout.addWidget(self.feature0,0,0)
+        self.groupBox1Layout.addWidget(self.feature1,0,1)
+        self.groupBox1Layout.addWidget(self.feature2,0,2)
+        self.groupBox1Layout.addWidget(self.feature3,0,3)
+        self.groupBox1Layout.addWidget(self.feature4,1,0)
+        self.groupBox1Layout.addWidget(self.feature5,1,1)
+        self.groupBox1Layout.addWidget(self.feature6,1,2)
+        self.groupBox1Layout.addWidget(self.feature7,1,3)
+        self.groupBox1Layout.addWidget(self.btnExecute,2,0)
+
+
+        self.fig = Figure()
+        self.ax1 = self.fig.add_subplot(111)
+        self.axes=[self.ax1]
+        self.canvas = FigureCanvas(self.fig)
+
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Expanding)
+
+        self.canvas.updateGeometry()
+
+
+        self.groupBox2 = QGroupBox('Correlation Plot')
+        self.groupBox2Layout= QVBoxLayout()
+        self.groupBox2.setLayout(self.groupBox2Layout)
+
+        self.groupBox2Layout.addWidget(self.canvas)
+
+
+        self.layout.addWidget(self.groupBox1)
+        self.layout.addWidget(self.groupBox2)
+
+        self.setCentralWidget(self.main_widget)
+        self.resize(900, 700)
+        self.show()
+        self.update()
+
+    def update(self):
+
+        #::------------------------------------------------------------
+        # Populates the elements in the canvas using the values
+        # chosen as parameters for the correlation plot
+        #::------------------------------------------------------------
+        self.ax1.clear()
+
+        X_1 = ff_happiness["Happiness.Score"]
+
+        list_corr_features = pd.DataFrame(ff_happiness["Happiness.Score"])
+        if self.feature0.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[0]]],axis=1)
+
+        if self.feature1.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[1]]],axis=1)
+
+        if self.feature2.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[2]]],axis=1)
+
+        if self.feature3.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[3]]],axis=1)
+        if self.feature4.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[4]]],axis=1)
+
+        if self.feature5.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[5]]],axis=1)
+
+        if self.feature6.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[6]]],axis=1)
+
+        if self.feature7.isChecked():
+            list_corr_features = pd.concat([list_corr_features, ff_happiness[features_list[7]]],axis=1)
+
+
+        vsticks = ["dummy"]
+        vsticks1 = list(list_corr_features.columns)
+        vsticks1 = vsticks + vsticks1
+        res_corr = list_corr_features.corr()
+        self.ax1.matshow(res_corr, cmap= plt.cm.get_cmap('Blues', 14))
+        self.ax1.set_yticklabels(vsticks1)
+        self.ax1.set_xticklabels(vsticks1,rotation = 90)
+
+        self.fig.tight_layout()
+        self.fig.canvas.draw_idle()
