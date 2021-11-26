@@ -186,6 +186,24 @@ rf.fit(X_train,y_train)
 rf.score(X_test,y_test)
 y_pred = rf.predict(X_test)
 
+estimator = rf.estimators_[1]
+
+os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+random_f = export_graphviz(estimator, out_file=None,
+                feature_names = X_train.columns,
+                rounded = True, proportion = False,
+                precision = 2, filled = True)
+graph = graph_from_dot_data(random_f)
+graph.write_pdf("random_forest.pdf")
+webbrowser.open_new(r'random_forest.pdf')
+
+#Decision Tree's Tree
+# os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+# decision_tree = export_graphviz(regressor, out_file=None, feature_names = X_train.columns,filled = True )
+# # proffesor settings for the decision tree dot_data = export_graphviz(clf_gini, filled=True, rounded=True, class_names=class_names, feature_names=data.iloc[:, 1:5].columns, out_file=None)
+# graph = graph_from_dot_data(decision_tree)
+# graph.write_pdf("decision_tree_gini.pdf")
+# webbrowser.open_new(r'decision_tree_gini.pdf')
 #rf.predict_proba(X_test)
 
 from sklearn import metrics
