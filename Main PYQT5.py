@@ -1,6 +1,6 @@
 """ Introduction to Data Mining Project
     Group-4
-    Names- Ricardo, Junran, Jeremiah, Osemekhian
+    Names- Ricardo, Justin, Jeremiah, Osemekhian
 """
 
 ######################################################################
