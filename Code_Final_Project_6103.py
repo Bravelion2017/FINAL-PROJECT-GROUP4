@@ -186,6 +186,24 @@ rf.fit(X_train,y_train)
 rf.score(X_test,y_test)
 y_pred = rf.predict(X_test)
 
+estimator = rf.estimators_[1]
+
+os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+random_f = export_graphviz(estimator, out_file=None,
+                feature_names = X_train.columns,
+                rounded = True, proportion = False,
+                precision = 2, filled = True)
+graph = graph_from_dot_data(random_f)
+graph.write_pdf("random_forest.pdf")
+webbrowser.open_new(r'random_forest.pdf')
+
+#Decision Tree's Tree
+# os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+# decision_tree = export_graphviz(regressor, out_file=None, feature_names = X_train.columns,filled = True )
+# # proffesor settings for the decision tree dot_data = export_graphviz(clf_gini, filled=True, rounded=True, class_names=class_names, feature_names=data.iloc[:, 1:5].columns, out_file=None)
+# graph = graph_from_dot_data(decision_tree)
+# graph.write_pdf("decision_tree_gini.pdf")
+# webbrowser.open_new(r'decision_tree_gini.pdf')
 #rf.predict_proba(X_test)
 
 from sklearn import metrics
@@ -281,29 +299,36 @@ webbrowser.open_new(r'decision_tree_gini.pdf')
 
 # LinearRegression with SCALING
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 lr = LinearRegression()
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 scaler.fit(X_train.iloc[:,[0,1,3,4,5]])
 scaled_data = scaler.transform(X_train.iloc[:,[0,1,3,4,5]]) #transforming only the numerical columns
-df = pd.DataFrame(scaled_data, columns=['GREScore' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
-getting_dummies = pd.get_dummies(X_train,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
-getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
+df = pd.DataFrame(scaled_data, columns=['GRE Score' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
+#getting_dummies = pd.get_dummies(X_train,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
+#getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
+UR_Research = X_train.iloc[:,[2,6]]
 
-new_X_train =  pd.concat([df.reset_index(drop=True),getting_dummies.reset_index(drop=True)], axis=1) #reseting the index to concat two dataframe
+new_X_train =  pd.concat([df.reset_index(drop=True),UR_Research.reset_index(drop=True)], axis=1) #reseting the index to concat two dataframe
 
 scaler.fit(X_test.iloc[:,[0,1,3,4,5]])
 scaled_data = scaler.transform(X_test.iloc[:,[0,1,3,4,5]]) #transforming only the numerical columns
-df = pd.DataFrame(scaled_data, columns=['GREScore' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
-getting_dummies = pd.get_dummies(X_test,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
-getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
-new_X_test =  pd.concat([df.reset_index(drop=True),getting_dummies.reset_index(drop=True)], axis=1)
+df = pd.DataFrame(scaled_data, columns=['GRE Score' ,'TOEFL Score' ,'SOP','LOR','CGPA']) # dataframe with the scaling features
+#getting_dummies = pd.get_dummies(X_test,columns=['University Rating','Research']) #gettig the dummies for University rating and researrcg
+#getting_dummies = getting_dummies.iloc[:,5:12] #adding only the dummies to our dt
+UR_Research2 = X_test.iloc[:,[2,6]]
+new_X_test =  pd.concat([df.reset_index(drop=True),UR_Research2.reset_index(drop=True)], axis=1)
 
 new_y_train = scaler.fit_transform(y_train.values.reshape(-1,1))
 new_y_test = scaler.fit_transform(y_test.values.reshape(-1,1))
 
+#new_X_train = scaler.fit_transform(X_train)
+#new_X_test = scaler.fit_transform(X_test)
+
 lr.fit(new_X_train,new_y_train)
-lr.score(new_X_test,new_y_test)
+print('Linear Regression Scaling Regression: ',lr.score(new_X_test,new_y_test))
+
 
 importances = pd.DataFrame(data={
     'Attribute': new_X_train.columns,
@@ -332,7 +357,7 @@ plt.xlabel("Chance of Admit")
 plt.legend()
 plt.show()
 score2=lr.score(X_test,y_test)
-print(f'Linear Regression Model Score: {np.round(score2,2)}%')
+print(f'Linear Regression Model Score: {np.round(score2,6)}%')
 
 
 
