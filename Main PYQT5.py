@@ -4,63 +4,69 @@
 """
 
 ######################################################################
-#---
+# ---
 import sys
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
-                             QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit, QTableView)
+                             QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit,
+                             QTableView)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QAbstractTableModel, Qt
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import Qt
-#from scipy import interp
+# from scipy import interp
 from scipy import interpolate
 from itertools import cycle
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QMessageBox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-#---
+# ---
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.linear_model import LinearRegression,LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import (RandomForestRegressor,GradientBoostingRegressor,
-                              AdaBoostRegressor,ExtraTreesRegressor)
+from sklearn.ensemble import (RandomForestRegressor, GradientBoostingRegressor,
+                              AdaBoostRegressor, ExtraTreesRegressor)
 from sklearn.neighbors import KNeighborsRegressor
 
-from sklearn.svm import SVR,SVC
-from sklearn.metrics import accuracy_score,mean_squared_error, r2_score
+from sklearn.svm import SVR, SVC
+from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn import tree
 from sklearn.tree import export_graphviz
 import os
 import warnings
+
 warnings.filterwarnings("ignore")
 from pydotplus import graph_from_dot_data
 import webbrowser
-#---
+
+# ---
 font_size_window = 'font-size:15px'
 os.environ["PATH"] += os.pathsep + 'C:\\Program Files (x86)\\graphviz-2.38\\release\\bin'
 os.environ['KAGGLE_USERNAME'] = 'koyanjo'
 os.environ['KAGGLE_KEY'] = '33bfba07e0815efc297a1a4488dbe6a3'
 
 from kaggle.api.kaggle_api_extended import KaggleApi
+
 dataset = 'mohansacharya/graduate-admissions'
 path = 'datasets/graduate-admissions'
 api = KaggleApi()
 api.authenticate()
 api.dataset_download_files(dataset, path)
 api.dataset_download_file(dataset, 'Admission_Predict.csv', path)
-#---
+
+
+# ---
 
 class CorrelationPlot(QMainWindow):
-    #;:-----------------------------------------------------------------------
+    # ;:-----------------------------------------------------------------------
     # This class creates a canvas to draw a correlation plot
     # It presents all the features plus the happiness score
     # the methods for this class are:
@@ -92,16 +98,15 @@ class CorrelationPlot(QMainWindow):
         self.layout = QVBoxLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('Heatmap Plot for Features')
-        self.groupBox1Layout= QGridLayout()
+        self.groupBox1Layout = QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-
-        self.feature0 = QCheckBox(features_list[0],self)
-        self.feature1 = QCheckBox(features_list[1],self)
+        self.feature0 = QCheckBox(features_list[0], self)
+        self.feature1 = QCheckBox(features_list[1], self)
         self.feature2 = QCheckBox(features_list[2], self)
         self.feature3 = QCheckBox(features_list[3], self)
-        self.feature4 = QCheckBox(features_list[4],self)
-        self.feature5 = QCheckBox(features_list[5],self)
+        self.feature4 = QCheckBox(features_list[4], self)
+        self.feature5 = QCheckBox(features_list[5], self)
         self.feature6 = QCheckBox(features_list[6], self)
         self.feature7 = QCheckBox(features_list[7], self)
         self.feature0.setChecked(True)
@@ -116,20 +121,19 @@ class CorrelationPlot(QMainWindow):
         self.btnExecute = QPushButton("Creat Heatmap")
         self.btnExecute.clicked.connect(self.update)
 
-        self.groupBox1Layout.addWidget(self.feature0,0,0)
-        self.groupBox1Layout.addWidget(self.feature1,0,1)
-        self.groupBox1Layout.addWidget(self.feature2,0,2)
-        self.groupBox1Layout.addWidget(self.feature3,0,3)
-        self.groupBox1Layout.addWidget(self.feature4,1,0)
-        self.groupBox1Layout.addWidget(self.feature5,1,1)
-        self.groupBox1Layout.addWidget(self.feature6,1,2)
-        self.groupBox1Layout.addWidget(self.feature7,1,3)
-        self.groupBox1Layout.addWidget(self.btnExecute,2,0)
-
+        self.groupBox1Layout.addWidget(self.feature0, 0, 0)
+        self.groupBox1Layout.addWidget(self.feature1, 0, 1)
+        self.groupBox1Layout.addWidget(self.feature2, 0, 2)
+        self.groupBox1Layout.addWidget(self.feature3, 0, 3)
+        self.groupBox1Layout.addWidget(self.feature4, 1, 0)
+        self.groupBox1Layout.addWidget(self.feature5, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature6, 1, 2)
+        self.groupBox1Layout.addWidget(self.feature7, 1, 3)
+        self.groupBox1Layout.addWidget(self.btnExecute, 2, 0)
 
         self.fig = Figure()
         self.ax1 = self.fig.add_subplot(111)
-        self.axes=[self.ax1]
+        self.axes = [self.ax1]
         self.canvas = FigureCanvas(self.fig)
 
         self.canvas.setSizePolicy(QSizePolicy.Expanding,
@@ -137,13 +141,11 @@ class CorrelationPlot(QMainWindow):
 
         self.canvas.updateGeometry()
 
-
         self.groupBox2 = QGroupBox('Heatmap Plot')
-        self.groupBox2Layout= QVBoxLayout()
+        self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
 
         self.groupBox2Layout.addWidget(self.canvas)
-
 
         self.layout.addWidget(self.groupBox1)
         self.layout.addWidget(self.groupBox2)
@@ -165,37 +167,36 @@ class CorrelationPlot(QMainWindow):
 
         list_corr_features = pd.DataFrame(per_new["Chance of Admit"])
         if self.feature0.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[0]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[1]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[2]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[3]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[3]]], axis=1)
         if self.feature4.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[4]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[5]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[6]]],axis=1)
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[6]]], axis=1)
 
         if self.feature7.isChecked():
-            list_corr_features = pd.concat([list_corr_features, per_new[features_list[7]]],axis=1)
-
+            list_corr_features = pd.concat([list_corr_features, per_new[features_list[7]]], axis=1)
 
         vsticks = ["dummy"]
         vsticks1 = list(list_corr_features.columns)
         vsticks1 = vsticks + vsticks1
         res_corr = list_corr_features.corr()
-        self.ax1.matshow(res_corr, cmap= plt.cm.get_cmap('autumn', 14))
-        #self.fig.colorbar(self.ax1.matshow(res_corr, cmap="summer"))
+        self.ax1.matshow(res_corr, cmap=plt.cm.get_cmap('autumn', 14))
+        # self.fig.colorbar(self.ax1.matshow(res_corr, cmap="summer"))
         self.ax1.set_yticklabels(vsticks1)
-        self.ax1.set_xticklabels(vsticks1,rotation = 90)
+        self.ax1.set_xticklabels(vsticks1, rotation=90)
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
@@ -217,7 +218,7 @@ class DecisionTree(QMainWindow):
     def __init__(self):
         super(DecisionTree, self).__init__()
 
-        self.Title ="Decision Tree Regression"
+        self.Title = "Decision Tree Regression"
         self.initUi()
 
     def initUi(self):
@@ -237,15 +238,15 @@ class DecisionTree(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('ML Linear Regression Features')
-        self.groupBox1Layout= QGridLayout()
+        self.groupBox1Layout = QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        self.feature0 = QCheckBox(features_list[0],self)
-        self.feature1 = QCheckBox(features_list[1],self)
+        self.feature0 = QCheckBox(features_list[0], self)
+        self.feature1 = QCheckBox(features_list[1], self)
         self.feature2 = QCheckBox(features_list[2], self)
         self.feature3 = QCheckBox(features_list[3], self)
-        self.feature4 = QCheckBox(features_list[4],self)
-        self.feature5 = QCheckBox(features_list[5],self)
+        self.feature4 = QCheckBox(features_list[4], self)
+        self.feature5 = QCheckBox(features_list[5], self)
         self.feature6 = QCheckBox(features_list[6], self)
         self.feature0.setChecked(True)
         self.feature1.setChecked(True)
@@ -274,18 +275,18 @@ class DecisionTree(QMainWindow):
         self.btnDTFigure.clicked.connect(self.view_tree)
         # We create a checkbox for each feature
 
-        self.groupBox1Layout.addWidget(self.feature0,0,0)
-        self.groupBox1Layout.addWidget(self.feature1,0,1)
-        self.groupBox1Layout.addWidget(self.feature2,1,0)
-        self.groupBox1Layout.addWidget(self.feature3,1,1)
-        self.groupBox1Layout.addWidget(self.feature4,2,0)
-        self.groupBox1Layout.addWidget(self.feature5,2,1)
-        self.groupBox1Layout.addWidget(self.feature6,3,0)
-        self.groupBox1Layout.addWidget(self.lblPercentTest,4,0)
-        self.groupBox1Layout.addWidget(self.txtPercentTest,4,1)
-        self.groupBox1Layout.addWidget(self.lblRandomState,4,2)
+        self.groupBox1Layout.addWidget(self.feature0, 0, 0)
+        self.groupBox1Layout.addWidget(self.feature1, 0, 1)
+        self.groupBox1Layout.addWidget(self.feature2, 1, 0)
+        self.groupBox1Layout.addWidget(self.feature3, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature4, 2, 0)
+        self.groupBox1Layout.addWidget(self.feature5, 2, 1)
+        self.groupBox1Layout.addWidget(self.feature6, 3, 0)
+        self.groupBox1Layout.addWidget(self.lblPercentTest, 4, 0)
+        self.groupBox1Layout.addWidget(self.txtPercentTest, 4, 1)
+        self.groupBox1Layout.addWidget(self.lblRandomState, 4, 2)
         self.groupBox1Layout.addWidget(self.txtRandomState, 4, 3)
-        self.groupBox1Layout.addWidget(self.btnExecute,6,0)
+        self.groupBox1Layout.addWidget(self.btnExecute, 6, 0)
         self.groupBox1Layout.addWidget(self.btnDTFigure, 6, 1)
 
         self.groupBox2 = QGroupBox('Actual vs Predicted')
@@ -328,18 +329,17 @@ class DecisionTree(QMainWindow):
         self.groupBoxG3.setLayout(self.groupBoxG3Layout)
         self.groupBoxG3Layout.addWidget(self.canvas)
 
-        #-----------------------------------------------
+        # -----------------------------------------------
 
-        self.layout.addWidget(self.groupBox1,0,0)
-        #self.layout.addWidget(self.groupBoxG1,0,1)
-        self.layout.addWidget(self.groupBox2,0,2)
+        self.layout.addWidget(self.groupBox1, 0, 0)
+        # self.layout.addWidget(self.groupBoxG1,0,1)
+        self.layout.addWidget(self.groupBox2, 0, 2)
         # self.layout.addWidget(self.groupBoxG2,1,1)
-        self.layout.addWidget(self.groupBoxG3,1,0)
+        self.layout.addWidget(self.groupBoxG3, 1, 0)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1100, 700)
         self.show()
-
 
     def update(self):
         '''
@@ -353,65 +353,63 @@ class DecisionTree(QMainWindow):
         # We process the parameters`
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
-            if len(self.list_corr_features)==0:
+            if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[0]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[0]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[1]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[1]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[2]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[2]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[3]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[3]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[3]]], axis=1)
 
         if self.feature4.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[4]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[4]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[5]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[5]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[6]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[6]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[6]]], axis=1)
 
-
-        vtest_per =float(self.txtPercentTest.text())
+        vtest_per = float(self.txtPercentTest.text())
         self.txtR3.clear()
         self.txtResults.clear()
         self.txtResults.setUndoRedoEnabled(False)
 
-        vtest_per = vtest_per/100
-
+        vtest_per = vtest_per / 100
 
         # We assign the values to X and y to run the algorithm
 
-        X_dt =  self.list_corr_features
+        X_dt = self.list_corr_features
         y_dt = per_new["Chance of Admit"]
 
         # split the dataset into train and test
-        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per,random_state=2)
+        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=2)
         # perform training with mse.
-        randomState= int(self.txtRandomState.text())
+        randomState = int(self.txtRandomState.text())
         self.dtr = DecisionTreeRegressor(max_depth=5, random_state=randomState)
 
         # Performing training
@@ -420,20 +418,19 @@ class DecisionTree(QMainWindow):
         # prediction on test
         y_pred = self.dtr.predict(X_test)
 
-        self.dtr_pred_df = pd.DataFrame({'y_test':y_test,'y_pred':np.round(y_pred,2)})
-
+        self.dtr_pred_df = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 2)})
 
         # accuracy score
         self.ff_accuracy_score = self.dtr.score(X_test, y_test)
-        self.txtAccuracy.setText(str(np.round(self.ff_accuracy_score*100,3))+'%')
+        self.txtAccuracy.setText(str(np.round(self.ff_accuracy_score * 100, 3)) + '%')
 
-        #R squared
-        self.r2=r2_score(y_test,y_pred)
-        self.txtR2.setText(str(np.round(self.r2*100))+'%')
+        # R squared
+        self.r2 = r2_score(y_test, y_pred)
+        self.txtR2.setText(str(np.round(self.r2 * 100)) + '%')
 
-        #MSE
-        self.mse= mean_squared_error(y_test,y_pred)
-        self.txtR3.setText(str(np.round(self.mse*100, 4))+'%')
+        # MSE
+        self.mse = mean_squared_error(y_test, y_pred)
+        self.txtR3.setText(str(np.round(self.mse * 100, 4)) + '%')
 
         # Feature importance
         feature_names = self.list_corr_features.columns
@@ -441,23 +438,24 @@ class DecisionTree(QMainWindow):
         self.txtResults.appendPlainText(self.dtr_pred_df.to_csv(sep="|", index=False))
         self.txtResults.updateGeometry()
 
-        #---test
+        # ---test
         self.ax3.clear()
-        #self.ax3.barh(feature_names,list(feature_importance['score']))
-        self.ax3.plot(feature_names,list(feature_importance['score']),'o-',color='g')
-        self.ax3.tick_params(axis='x',labelsize=7)
+        # self.ax3.barh(feature_names,list(feature_importance['score']))
+        self.ax3.plot(feature_names, list(feature_importance['score']), 'o-', color='g')
+        self.ax3.tick_params(axis='x', labelsize=7)
         self.ax3.set_aspect('auto')
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
 
     def view_tree(self):
-        dot_data = export_graphviz(self.dtr, out_file=None,feature_names=self.list_corr_features.columns,filled=True,max_depth=4)
+        dot_data = export_graphviz(self.dtr, out_file=None, feature_names=self.list_corr_features.columns, filled=True,
+                                   max_depth=4)
         graph = graph_from_dot_data(dot_data)
         graph.write_pdf("decision_tree_regressor.pdf")
         webbrowser.open_new(r'decision_tree_regressor.pdf')
 
-class RandomForest(QMainWindow):
 
+class RandomForest(QMainWindow):
     send_fig = pyqtSignal(str)
 
     def __init__(self):
@@ -509,10 +507,10 @@ class RandomForest(QMainWindow):
         self.txtMin_sample_split = QLineEdit(self)
         self.txtMin_sample_split.setText("2")
 
-        #self.lblRandomState = QLabel('Max Features :')
-        #self.lblRandomState.adjustSize()
-        #self.txtRandomState = QLineEdit(self)
-        #self.txtRandomState.setText("sqrt")
+        # self.lblRandomState = QLabel('Max Features :')
+        # self.lblRandomState.adjustSize()
+        # self.txtRandomState = QLineEdit(self)
+        # self.txtRandomState.setText("sqrt")
 
         self.lblMin_samples_leaf = QLabel('Min samples leaf :')
         self.lblMin_samples_leaf.adjustSize()
@@ -586,17 +584,15 @@ class RandomForest(QMainWindow):
         self.groupBoxG3.setLayout(self.groupBoxG3Layout)
         self.groupBoxG3Layout.addWidget(self.canvas)
 
-
-        self.layout.addWidget(self.groupBox1,0,0)
-        #self.layout.addWidget(self.groupBoxG1,0,1)
-        self.layout.addWidget(self.groupBox2,0,2)
+        self.layout.addWidget(self.groupBox1, 0, 0)
+        # self.layout.addWidget(self.groupBoxG1,0,1)
+        self.layout.addWidget(self.groupBox2, 0, 2)
         # self.layout.addWidget(self.groupBoxG2,1,1)
-        self.layout.addWidget(self.groupBoxG3,1,0)
+        self.layout.addWidget(self.groupBoxG3, 1, 0)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1100, 700)
         self.show()
-
 
     def update(self):
         # We process the parameters`
@@ -655,38 +651,39 @@ class RandomForest(QMainWindow):
         X_dt = self.list_corr_features
         y_dt = per_new["Chance of Admit"]
 
-        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per,random_state=2)
+        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=2)
 
         n_estimators1 = int(self.txtN_estimators.text())
         min_samples_split2 = int(self.txtMin_sample_split.text())
         min_samples_leaf3 = int(self.txtMin_samples_leaf.text())
-        #max_features4 = str(self.txtmax_features.text())
+        # max_features4 = str(self.txtmax_features.text())
         max_depth5 = int(self.txtMax_depth.text())
 
-        self.rf = RandomForestRegressor(n_estimators=n_estimators1, min_samples_split=min_samples_split2, min_samples_leaf=min_samples_leaf3, max_features='sqrt',
-                                   max_depth=max_depth5, bootstrap=True) ## set all in initUI
+        self.rf = RandomForestRegressor(n_estimators=n_estimators1, min_samples_split=min_samples_split2,
+                                        min_samples_leaf=min_samples_leaf3, max_features='sqrt',
+                                        max_depth=max_depth5, bootstrap=True)  ## set all in initUI
 
-        #performing training and prediction
+        # performing training and prediction
         self.rf.fit(X_train, y_train)
         y_pred = self.rf.predict(X_test)
 
-        #prediction
-        self.rf_pred_df = pd.DataFrame({'y_test': y_test,'y_pred': np.round(y_pred,2)})
+        # prediction
+        self.rf_pred_df = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 2)})
 
-        #accuracy
+        # accuracy
 
-        self.rf_accuracy_score = self.rf.score(X_test,y_test)
-        self.txtAccuracy.setText(str(np.round(self.rf_accuracy_score*100,3))+'%')
+        self.rf_accuracy_score = self.rf.score(X_test, y_test)
+        self.txtAccuracy.setText(str(np.round(self.rf_accuracy_score * 100, 3)) + '%')
 
-        #R_squared
-        self.r2 = r2_score(y_test,y_pred)
-        self.txtR2.setText(str(np.round(self.r2*100))+'%')
-        #MSE
-        self.mse = mean_squared_error(y_test,y_pred)
-        self.txtR3.setText(str(np.round(self.mse*100, 4))+'%')
+        # R_squared
+        self.r2 = r2_score(y_test, y_pred)
+        self.txtR2.setText(str(np.round(self.r2 * 100)) + '%')
+        # MSE
+        self.mse = mean_squared_error(y_test, y_pred)
+        self.txtR3.setText(str(np.round(self.mse * 100, 4)) + '%')
 
         # Feature importance
-        feature_names = ['GRE', 'TOEFL','URating','SOP','LOR','CGPA','Research']
+        feature_names = ['GRE', 'TOEFL', 'URating', 'SOP', 'LOR', 'CGPA', 'Research']
         feature_imp = self.rf.feature_importances_
 
         feature_importance = pd.DataFrame(self.rf.feature_importances_, index=feature_names, columns=['score'])
@@ -696,22 +693,21 @@ class RandomForest(QMainWindow):
         # ---test , try to do a barplot
         self.ax3.clear()
         # self.ax3.barh(feature_names,list(feature_importance['score']))
-        self.ax3.bar(x=feature_names, height = feature_imp, color=c)
+        self.ax3.bar(x=feature_names, height=feature_imp, color=c)
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
 
-class cross(QMainWindow):
 
+class cross(QMainWindow):
     send_fig = pyqtSignal(str)
 
     def __init__(self):
         super(cross, self).__init__()
 
-        self.Title ="Cross Validation"
+        self.Title = "Cross Validation"
         self.initUi()
 
     def initUi(self):
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
         self.setWindowIcon(QIcon('pty.png'))
@@ -726,34 +722,35 @@ class cross(QMainWindow):
 
         self.lbl1 = QLabel('Linear Regression :')
         self.txt1 = QLineEdit(self)
-        self.txt1.setText(str(np.round(cross_val_score(LinearRegression(), x, y).mean()*100,2))+'%')
+        self.txt1.setText(str(np.round(cross_val_score(LinearRegression(), x, y).mean() * 100, 2)) + '%')
         self.lbl2 = QLabel('Decision Tree Reg :')
         self.txt2 = QLineEdit(self)
-        self.txt2.setText(str(np.round(cross_val_score(DecisionTreeRegressor(random_state=2), x, y).mean()*100,2))+'%')
+        self.txt2.setText(
+            str(np.round(cross_val_score(DecisionTreeRegressor(random_state=2), x, y).mean() * 100, 2)) + '%')
         self.lbl3 = QLabel('Random Forest Reg :')
         self.txt3 = QLineEdit(self)
-        self.txt3.setText(str(np.round(cross_val_score(RandomForestRegressor(n_estimators=50,random_state=2), x, y).mean()*100,2))+'%')
+        self.txt3.setText(
+            str(np.round(cross_val_score(RandomForestRegressor(n_estimators=50, random_state=2), x, y).mean() * 100,
+                         2)) + '%')
         self.lbl4 = QLabel('Gradient Boosting Reg :')
         self.txt4 = QLineEdit(self)
-        self.txt4.setText(str(np.round(cross_val_score(GradientBoostingRegressor(), x, y).mean()*100,2))+'%')
+        self.txt4.setText(str(np.round(cross_val_score(GradientBoostingRegressor(), x, y).mean() * 100, 2)) + '%')
         self.lbl5 = QLabel('Ada Boosting Reg :')
         self.txt5 = QLineEdit(self)
-        self.txt5.setText(str(np.round(cross_val_score(AdaBoostRegressor(), x, y).mean()*100,2))+'%')
+        self.txt5.setText(str(np.round(cross_val_score(AdaBoostRegressor(), x, y).mean() * 100, 2)) + '%')
         self.lbl6 = QLabel('Extra Tree Reg :')
         self.txt6 = QLineEdit(self)
-        self.txt6.setText(str(np.round(cross_val_score(ExtraTreesRegressor(), x, y).mean()*100,2))+'%')
+        self.txt6.setText(str(np.round(cross_val_score(ExtraTreesRegressor(), x, y).mean() * 100, 2)) + '%')
         self.lbl7 = QLabel('KNeighbors Reg :')
         self.txt7 = QLineEdit(self)
-        self.txt7.setText(str(np.round(cross_val_score(KNeighborsRegressor(), x, y).mean()*100,2))+'%')
+        self.txt7.setText(str(np.round(cross_val_score(KNeighborsRegressor(), x, y).mean() * 100, 2)) + '%')
         self.lbl8 = QLabel('Support Vector Reg :')
         self.txt8 = QLineEdit(self)
-        self.txt8.setText(str(np.round(cross_val_score(SVR(), x, y).mean()*100,2))+'%')
-
-
+        self.txt8.setText(str(np.round(cross_val_score(SVR(), x, y).mean() * 100, 2)) + '%')
 
         # We create a checkbox for each model
-        self.groupBox1Layout.addWidget(self.lbl1,0,0)
-        self.groupBox1Layout.addWidget(self.txt1,0,1)
+        self.groupBox1Layout.addWidget(self.lbl1, 0, 0)
+        self.groupBox1Layout.addWidget(self.txt1, 0, 1)
         self.groupBox1Layout.addWidget(self.lbl2, 1, 0)
         self.groupBox1Layout.addWidget(self.txt2, 1, 1)
         self.groupBox1Layout.addWidget(self.lbl3, 2, 0)
@@ -769,8 +766,7 @@ class cross(QMainWindow):
         self.groupBox1Layout.addWidget(self.lbl8, 7, 0)
         self.groupBox1Layout.addWidget(self.txt8, 7, 1)
 
-
-        #testy
+        # testy
         self.fig1 = Figure()
         self.ax1 = self.fig1.add_subplot(111)
         self.axes1 = [self.ax1]
@@ -779,15 +775,15 @@ class cross(QMainWindow):
         self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.canvas.updateGeometry()
-        #testy
+        # testy
 
         self.groupBox2 = QGroupBox('Model Scores')
         self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
         self.groupBox2Layout.addWidget(self.canvas)
 
-        self.layout.addWidget(self.groupBox1,0,0)
-        self.layout.addWidget(self.groupBox2,0,1)
+        self.layout.addWidget(self.groupBox1, 0, 0)
+        self.layout.addWidget(self.groupBox2, 0, 1)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1100, 700)
@@ -796,8 +792,9 @@ class cross(QMainWindow):
         # ---test
         self.ax1.clear()
         # xx = np.arange(len(y_pred))
-        self.ax1.plot(cval.index, cval['score'],marker='o',label="Model Score",color='green')
-        self.ax1.legend()
+        #self.ax1.plot(cval.index, cval['score'], marker='o', label="Model Score", color='green')
+        c = ['red', 'yellow', 'black', 'blue', 'orange', 'green', 'purple']
+        self.ax1.bar(x=cval.index, height=cval['score'],color=c)
         self.ax1.tick_params(axis='x', labelsize=7)
         # self.ax1.plot(xx, y_test, color='green', lw=2, label="actual", alpha=0.5)
         self.ax1.set_ylabel("Model's Mean Score")
@@ -805,7 +802,7 @@ class cross(QMainWindow):
         self.fig1.canvas.draw_idle()
 
 
-#test
+# test
 class Regression(QMainWindow):
     #::----------------------
     # Implementation of Linear Regression Algorithm using the admission dataset
@@ -820,7 +817,7 @@ class Regression(QMainWindow):
     def __init__(self):
         super(Regression, self).__init__()
 
-        self.Title ="Linear Regression"
+        self.Title = "Linear Regression"
         self.initUi()
 
     def initUi(self):
@@ -834,15 +831,15 @@ class Regression(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('ML Linear Regression Features')
-        self.groupBox1Layout= QGridLayout()
+        self.groupBox1Layout = QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        self.feature0 = QCheckBox(features_list[0],self)
-        self.feature1 = QCheckBox(features_list[1],self)
+        self.feature0 = QCheckBox(features_list[0], self)
+        self.feature1 = QCheckBox(features_list[1], self)
         self.feature2 = QCheckBox(features_list[2], self)
         self.feature3 = QCheckBox(features_list[3], self)
-        self.feature4 = QCheckBox(features_list[4],self)
-        self.feature5 = QCheckBox(features_list[5],self)
+        self.feature4 = QCheckBox(features_list[4], self)
+        self.feature5 = QCheckBox(features_list[5], self)
         self.feature6 = QCheckBox(features_list[6], self)
         self.feature0.setChecked(True)
         self.feature1.setChecked(True)
@@ -857,25 +854,22 @@ class Regression(QMainWindow):
         self.txtPercentTest = QLineEdit(self)
         self.txtPercentTest.setText("20")
 
-
-
         self.btnExecute = QPushButton("Execute LR")
         self.btnExecute.setShortcut("Ctrl+E")
         self.btnExecute.clicked.connect(self.update)
 
-
         # We create a checkbox for each feature
 
-        self.groupBox1Layout.addWidget(self.feature0,0,0)
-        self.groupBox1Layout.addWidget(self.feature1,0,1)
-        self.groupBox1Layout.addWidget(self.feature2,1,0)
-        self.groupBox1Layout.addWidget(self.feature3,1,1)
-        self.groupBox1Layout.addWidget(self.feature4,2,0)
-        self.groupBox1Layout.addWidget(self.feature5,2,1)
-        self.groupBox1Layout.addWidget(self.feature6,3,0)
-        self.groupBox1Layout.addWidget(self.lblPercentTest,4,0)
-        self.groupBox1Layout.addWidget(self.txtPercentTest,4,1)
-        self.groupBox1Layout.addWidget(self.btnExecute,5,0)
+        self.groupBox1Layout.addWidget(self.feature0, 0, 0)
+        self.groupBox1Layout.addWidget(self.feature1, 0, 1)
+        self.groupBox1Layout.addWidget(self.feature2, 1, 0)
+        self.groupBox1Layout.addWidget(self.feature3, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature4, 2, 0)
+        self.groupBox1Layout.addWidget(self.feature5, 2, 1)
+        self.groupBox1Layout.addWidget(self.feature6, 3, 0)
+        self.groupBox1Layout.addWidget(self.lblPercentTest, 4, 0)
+        self.groupBox1Layout.addWidget(self.txtPercentTest, 4, 1)
+        self.groupBox1Layout.addWidget(self.btnExecute, 5, 0)
 
         self.groupBox2 = QGroupBox('Actual vs Predicted')
         self.groupBox2Layout = QVBoxLayout()
@@ -912,82 +906,79 @@ class Regression(QMainWindow):
         self.groupBoxG3.setLayout(self.groupBoxG3Layout)
         self.groupBoxG3Layout.addWidget(self.canvas)
 
-        #-------------------------------------------------
+        # -------------------------------------------------
 
-        self.layout.addWidget(self.groupBox1,0,0)
-        self.layout.addWidget(self.groupBox2,0,2)
-        self.layout.addWidget(self.groupBoxG3,1,0)
+        self.layout.addWidget(self.groupBox1, 0, 0)
+        self.layout.addWidget(self.groupBox2, 0, 2)
+        self.layout.addWidget(self.groupBoxG3, 1, 0)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1100, 700)
         self.show()
-
 
     def update(self):
 
         # We process the parameters`
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
-            if len(self.list_corr_features)==0:
+            if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[0]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[0]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[1]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[1]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[2]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[2]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[3]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[3]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[3]]], axis=1)
 
         if self.feature4.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[4]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[4]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[5]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[5]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = per_new[features_list[6]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[6]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, per_new[features_list[6]]], axis=1)
 
+        vtest_per = float(self.txtPercentTest.text())
 
-        vtest_per =float(self.txtPercentTest.text())
-
-        #self.ax1.clear()
+        # self.ax1.clear()
         # self.ax2.clear()
         # self.ax3.clear()
         self.txtResults.clear()
         self.txtResults.setUndoRedoEnabled(False)
 
-        vtest_per = vtest_per/100
-
+        vtest_per = vtest_per / 100
 
         # We assign the values to X and y to run the algorithm
 
-        X_dt =  self.list_corr_features
+        X_dt = self.list_corr_features
         y_dt = per_new["Chance of Admit"]
 
         # split the dataset into train and test
-        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per,random_state=2)
+        X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=2)
         # perform training with mse.
         # Decision tree with gini
         self.lr = LinearRegression()
@@ -998,24 +989,24 @@ class Regression(QMainWindow):
         # prediction on test
         y_pred = self.lr.predict(X_test)
 
-        self.lr_pred = pd.DataFrame({'y_test':y_test,'y_pred':np.round(y_pred,2)})
-        self.txtResults.appendPlainText(self.lr_pred.to_csv(sep="|",index=False))
+        self.lr_pred = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 2)})
+        self.txtResults.appendPlainText(self.lr_pred.to_csv(sep="|", index=False))
         self.txtResults.updateGeometry()
 
         # accuracy score
 
         self.ff_accuracy_score = self.lr.score(X_test, y_test)
-        self.txtAccuracy.setText(str(np.round(self.ff_accuracy_score*100,3))+'%')
+        self.txtAccuracy.setText(str(np.round(self.ff_accuracy_score * 100, 3)) + '%')
 
-        #R squared
-        self.r2=r2_score(y_test,y_pred)
-        self.txtR2.setText(str(np.round(self.r2*100))+'%')
+        # R squared
+        self.r2 = r2_score(y_test, y_pred)
+        self.txtR2.setText(str(np.round(self.r2 * 100)) + '%')
 
-        #---plot
+        # ---plot
         self.ax1.clear()
-        xx=np.arange(len(y_pred))
-        self.ax1.plot(xx,y_pred,color='red',lw=2,label="predicted",alpha=0.5)
-        self.ax1.plot(xx,y_test,color='green',lw=2,label="actual",alpha=0.5)
+        xx = np.arange(len(y_pred))
+        self.ax1.plot(xx, y_pred, color='red', lw=2, label="predicted", alpha=0.5)
+        self.ax1.plot(xx, y_test, color='green', lw=2, label="actual", alpha=0.5)
         self.ax1.set_ylabel("Chance of Admission")
         self.ax1.legend(loc="lower right")
         self.fig1.tight_layout()
@@ -1046,9 +1037,8 @@ class AdmitGraphs(QMainWindow):
 
         self.fig = Figure()
         self.ax1 = self.fig.add_subplot(111)
-        self.axes=[self.ax1]
+        self.axes = [self.ax1]
         self.canvas = FigureCanvas(self.fig)
-
 
         self.canvas.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Expanding)
@@ -1057,7 +1047,7 @@ class AdmitGraphs(QMainWindow):
 
         self.dropdown1 = QComboBox()
         self.dropdown1.addItems(['GRE Score', 'TOEFL Score', 'University Rating', 'SOP', 'LOR', 'CGPA',
-                   'Research'])
+                                 'Research'])
 
         self.dropdown1.currentIndexChanged.connect(self.update)
         self.label = QLabel("A plot:")
@@ -1085,15 +1075,14 @@ class AdmitGraphs(QMainWindow):
         X_1 = per_new["Chance of Admit"]
         y_1 = per_new[cat1]
 
-        self.ax1.scatter(X_1,y_1)
+        self.ax1.scatter(X_1, y_1)
 
         if self.checkbox1.isChecked():
-
             b, m = polyfit(X_1, y_1, 1)
 
             self.ax1.plot(X_1, b + m * X_1, '-', color="green")
 
-        vtitle = "Chance of Admission vrs "+ cat1
+        vtitle = "Chance of Admission vrs " + cat1
         self.ax1.set_title(vtitle)
         self.ax1.set_xlabel("Chance of Admission")
         self.ax1.set_ylabel(cat1)
@@ -1101,7 +1090,6 @@ class AdmitGraphs(QMainWindow):
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
-
 
 
 ##test
@@ -1125,6 +1113,7 @@ class PlotCanvas(FigureCanvas):
     def plot(self):
         self.ax = self.figure.add_subplot(111)
 
+
 class CanvasWindow(QMainWindow):
     #::----------------------------------
     # Creates a canvaas containing the plot for the initial analysis
@@ -1139,7 +1128,6 @@ class CanvasWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
 
@@ -1147,8 +1135,6 @@ class CanvasWindow(QMainWindow):
 
         self.m = PlotCanvas(self, width=5, height=4)
         self.m.move(0, 30)
-
-
 
 
 class App(QMainWindow):
@@ -1199,7 +1185,7 @@ class App(QMainWindow):
         #::----------------------------------------
         # EDA analysis
 
-        EDA1Button = QAction(QIcon('pty.png'),'Distribution', self)
+        EDA1Button = QAction(QIcon('pty.png'), 'Distribution', self)
         EDA1Button.setStatusTip('Distribution of Chance of Admission')
         EDA1Button.triggered.connect(self.EDA1)
         EDAMenu.addAction(EDA1Button)
@@ -1224,7 +1210,7 @@ class App(QMainWindow):
         # Decision Tree Model
         #::--------------------------------------------------
 
-        MLModel1Button =  QAction(QIcon('pty.png'), 'Linear Regression', self)
+        MLModel1Button = QAction(QIcon('pty.png'), 'Linear Regression', self)
         MLModel1Button.setStatusTip('Linear Regression')
         MLModelMenu.addAction(MLModel1Button)
         MLModel1Button.triggered.connect(self.MLLR)
@@ -1232,7 +1218,7 @@ class App(QMainWindow):
         #::------------------------------------------------------
         # Decision Tree Regression
         #::------------------------------------------------------
-        MLModel2Button= QAction(QIcon('pty.png'),'Decision Tree Regression', self)
+        MLModel2Button = QAction(QIcon('pty.png'), 'Decision Tree Regression', self)
         MLModel2Button.setStatusTip('Decision Tree Regression')
         MLModelMenu.addAction(MLModel2Button)
         MLModel2Button.triggered.connect(self.MLDT)
@@ -1265,7 +1251,7 @@ class App(QMainWindow):
         #::------------------------------------------------------
         dialog = CanvasWindow(self)
         dialog.m.plot()
-        dialog.m.ax.hist(y,bins=10, facecolor='blue', alpha=0.5)
+        dialog.m.ax.hist(y, bins=10, facecolor='blue', alpha=0.5)
         dialog.m.ax.set_title('Frequency of Chance of Admission')
         dialog.m.ax.set_xlabel("Chance of Admission")
         dialog.m.ax.set_ylabel("Count of Students")
@@ -1289,7 +1275,7 @@ class App(QMainWindow):
         dialog.show()
 
     def MLDT(self):
-        dialog= DecisionTree()
+        dialog = DecisionTree()
         self.dialogs.append(dialog)
         dialog.show()
 
@@ -1303,16 +1289,18 @@ class App(QMainWindow):
         dialog.show()
 
     def MLS(self):
-        dialog= cross()
+        dialog = cross()
         self.dialogs.append(dialog)
         dialog.show()
+
     #
     def MLRF(self):
-    #     #::-------------------------------------------------------------
-    #     # This function creates an instance of the Random Forest Regression Algorithm
+        #     #::-------------------------------------------------------------
+        #     # This function creates an instance of the Random Forest Regression Algorithm
         dialog = RandomForest()
         self.dialogs.append(dialog)
         dialog.show()
+
 
 def main():
     #::-------------------------------------------------
@@ -1324,8 +1312,9 @@ def main():
     ex.show()
     sys.exit(app.exec_())
 
+
 def data_admit():
-    global per_new, x, y, features_list, models,cval
+    global per_new, x, y, features_list, models, cval
     # Importing Dataset
     per = pd.read_csv("datasets/graduate-admissions/Admission_Predict.csv")
     print(per.head())
@@ -1341,8 +1330,8 @@ def data_admit():
     # Checking for Outliers with InterQuatile Range Detection for Int and Float
 
     names = ['GRE Score', 'TOEFL Score', 'SOP', 'LOR', 'CGPA', 'Chance of Admit']
-    features_list=['GRE Score', 'TOEFL Score', 'University Rating', 'SOP', 'LOR', 'CGPA',
-                   'Research', 'Chance of Admit']
+    features_list = ['GRE Score', 'TOEFL Score', 'University Rating', 'SOP', 'LOR', 'CGPA',
+                     'Research', 'Chance of Admit']
 
     int_df = per_new.drop(['University Rating', 'Research', 'GRE Groups', 'TOEFL Groups'], axis=1)
     n = 0
@@ -1365,17 +1354,18 @@ def data_admit():
 
     x, y = per_new.drop(['Chance of Admit', 'GRE Groups', 'TOEFL Groups'], axis=1), per_new['Chance of Admit']
     models = ['Linear Reg', 'DT Reg', 'RF Reg', 'GB Reg', 'Ada B Reg',
-                   'ExtraTree Reg', 'K-NeighborsReg', 'SVR']
-    score=[]
+              'ExtraTree Reg', 'K-NeighborsReg', 'SVR']
+    score = []
     score.append(np.round(cross_val_score(LinearRegression(), x, y).mean() * 100, 2))
-    score.append(np.round(cross_val_score(DecisionTreeRegressor(), x, y).mean() * 100,2))
-    score.append(np.round(cross_val_score(RandomForestRegressor(n_estimators=50,random_state=2), x, y).mean() * 100, 2))
+    score.append(np.round(cross_val_score(DecisionTreeRegressor(), x, y).mean() * 100, 2))
+    score.append(
+        np.round(cross_val_score(RandomForestRegressor(n_estimators=50, random_state=2), x, y).mean() * 100, 2))
     score.append(np.round(cross_val_score(GradientBoostingRegressor(), x, y).mean() * 100, 2))
     score.append(np.round(cross_val_score(AdaBoostRegressor(), x, y).mean() * 100, 2))
     score.append(np.round(cross_val_score(ExtraTreesRegressor(), x, y).mean() * 100, 2))
     score.append(np.round(cross_val_score(KNeighborsRegressor(), x, y).mean() * 100, 2))
     score.append(np.round(cross_val_score(SVR(), x, y).mean() * 100, 2))
-    cval=pd.DataFrame(score,index=models,columns=['score'])
+    cval = pd.DataFrame(score, index=models, columns=['score'])
 
 
 if __name__ == '__main__':
