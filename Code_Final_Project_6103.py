@@ -184,6 +184,7 @@ rf_improve.best_params_
 rf = RandomForestRegressor(n_estimators= 80,min_samples_split = 2,min_samples_leaf = 1,max_features = 'sqrt',max_depth = 10,bootstrap = True)
 rf.fit(X_train,y_train)
 rf.score(X_test,y_test)
+
 y_pred = rf.predict(X_test)
 
 estimator = rf.estimators_[1]
