@@ -692,8 +692,8 @@ class RandomForest(QMainWindow):
         c = ['red', 'yellow', 'black', 'blue', 'orange', 'green', 'purple']
         # ---test , try to do a barplot
         self.ax3.clear()
-        # self.ax3.barh(feature_names,list(feature_importance['score']))
-        self.ax3.bar(x=feature_names, height=feature_imp, color=c)
+        # self.ax3.bar(x=feature_names, height=feature_imp, color=c)
+        sns.barplot(x=feature_names, y=feature_imp, ax=self.ax3, palette='Blues_d')
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
 
@@ -794,7 +794,8 @@ class cross(QMainWindow):
         # xx = np.arange(len(y_pred))
         #self.ax1.plot(cval.index, cval['score'], marker='o', label="Model Score", color='green')
         c = ['red', 'yellow', 'black', 'blue', 'orange', 'green', 'purple']
-        self.ax1.bar(x=cval.index, height=cval['score'],color=c)
+        # self.ax1.bar(x=cval.index, height=cval['score'],color=c)
+        sns.barplot(y=cval.index, x=cval['score'],ax=self.ax1,orient='h',palette='Blues_d')
         self.ax1.tick_params(axis='x', labelsize=7)
         # self.ax1.plot(xx, y_test, color='green', lw=2, label="actual", alpha=0.5)
         self.ax1.set_ylabel("Model's Mean Score")
@@ -1004,11 +1005,10 @@ class Regression(QMainWindow):
 
         # ---plot
         self.ax1.clear()
-        xx = np.arange(len(y_pred))
-        self.ax1.plot(xx, y_pred, color='red', lw=2, label="predicted", alpha=0.5)
-        self.ax1.plot(xx, y_test, color='green', lw=2, label="actual", alpha=0.5)
+        sns.kdeplot(x=y_test,ax=self.ax1,shade=True,label="actual")
+        sns.kdeplot(x=y_pred,ax=self.ax1,shade=True,label="predicted")
         self.ax1.set_ylabel("Chance of Admission")
-        self.ax1.legend(loc="lower right")
+        self.ax1.legend(loc="upper left")
         self.fig1.tight_layout()
         self.fig1.canvas.draw_idle()
 
@@ -1075,7 +1075,7 @@ class AdmitGraphs(QMainWindow):
         X_1 = per_new["Chance of Admit"]
         y_1 = per_new[cat1]
 
-        self.ax1.scatter(X_1, y_1)
+        sns.scatterplot(x=X_1, y=y_1,data=per_new,palette='deep',legend='full',ax=self.ax1)
 
         if self.checkbox1.isChecked():
             b, m = polyfit(X_1, y_1, 1)
@@ -1093,7 +1093,62 @@ class AdmitGraphs(QMainWindow):
 
 
 ##test
+class box(QMainWindow):
+    #::---------------------------------------------------------
+    # This class crates a canvas with a Boxplot
+    #::---------------------------------------------------------
+    send_fig = pyqtSignal(str)
 
+    def __init__(self):
+        #::--------------------------------------------------------
+        # Crate a canvas with the layout to draw a plot
+        super(box, self).__init__()
+
+        self.Title = "BOXPLOT"
+        self.main_widget = QWidget(self)
+
+        self.setWindowTitle(self.Title)
+        self.setStyleSheet(font_size_window)
+        self.setWindowIcon(QIcon('pty.png'))
+
+        self.fig = Figure()
+        self.ax1 = self.fig.add_subplot(111)
+        self.axes = [self.ax1]
+        self.canvas = FigureCanvas(self.fig)
+
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Expanding)
+
+        self.canvas.updateGeometry()
+
+        self.dropdown1 = QComboBox()
+        self.dropdown1.addItems(['GRE Score', 'TOEFL Score', 'SOP', 'LOR', 'CGPA'])
+
+        self.dropdown1.currentIndexChanged.connect(self.update)
+        self.label = QLabel("A plot:")
+
+        self.layout = QGridLayout(self.main_widget)
+        self.layout.addWidget(self.dropdown1)
+        self.layout.addWidget(self.canvas)
+
+        self.setCentralWidget(self.main_widget)
+        self.show()
+        self.update()
+
+    def update(self):
+        #::--------------------------------------------------------
+        # This method executes each time a change is made on the canvas
+        # containing the elements of the graph
+        self.ax1.clear()
+        cat = self.dropdown1.currentText()
+        sns.boxplot(per_new[cat],ax=self.ax1)
+        vtitle = "Boxplot of "+cat
+        self.ax1.set_title(vtitle)
+
+        self.fig.tight_layout()
+        self.fig.canvas.draw_idle()
+
+##test
 class PlotCanvas(FigureCanvas):
     #::----------------------------------------------------------
     # creates a figure on the canvas
@@ -1200,6 +1255,11 @@ class App(QMainWindow):
         EDA4Button.triggered.connect(self.EDA4)
         EDAMenu.addAction(EDA4Button)
 
+        EDA5Button = QAction(QIcon('pty.png'), 'Box Plot', self)
+        EDA5Button.setStatusTip('Box Plot')
+        EDA5Button.triggered.connect(self.EDA5)
+        EDAMenu.addAction(EDA5Button)
+
         #::--------------------------------------------------
         # ML Models for prediction
         # There are three models
@@ -1251,11 +1311,9 @@ class App(QMainWindow):
         #::------------------------------------------------------
         dialog = CanvasWindow(self)
         dialog.m.plot()
-        dialog.m.ax.hist(y, bins=10, facecolor='blue', alpha=0.5)
-        dialog.m.ax.set_title('Frequency of Chance of Admission')
+        sns.histplot(y,kde='gau',ax=dialog.m.ax,bins=20)
+        dialog.m.ax.set_title('Distribution of Chance of Admission')
         dialog.m.ax.set_xlabel("Chance of Admission")
-        dialog.m.ax.set_ylabel("Count of Students")
-        dialog.m.ax.grid(True)
         dialog.m.draw()
         self.dialogs.append(dialog)
         dialog.show()
@@ -1271,6 +1329,12 @@ class App(QMainWindow):
         # This function creates an instance of the CorrelationPlot class
         #::----------------------------------------------------------
         dialog = CorrelationPlot()
+        self.dialogs.append(dialog)
+        dialog.show()
+
+    def EDA5(self):
+        #::---------------------------------------------------------
+        dialog = box()
         self.dialogs.append(dialog)
         dialog.show()
 
