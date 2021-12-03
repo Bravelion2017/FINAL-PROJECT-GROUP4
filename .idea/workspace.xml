@@ -153,7 +153,8 @@
       <workItem from="1638330568305" duration="888000" />
       <workItem from="1638413537114" duration="1252000" />
       <workItem from="1638484998380" duration="607000" />
-      <workItem from="1638495074198" duration="1279000" />
+      <workItem from="1638495074198" duration="3146000" />
+      <workItem from="1638563806227" duration="799000" />
     </task>
     <servers />
   </component>
@@ -176,6 +177,6 @@
     <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Code_Final_Project_6103.coverage" NAME="Code_Final_Project_6103 Coverage Results" MODIFIED="1636848181792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Code_Final.coverage" NAME="Code Final Coverage Results" MODIFIED="1637941023063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$MAIN.coverage" NAME="MAIN Coverage Results" MODIFIED="1637782184935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Main_PYQT5.coverage" NAME="Main PYQT5 Coverage Results" MODIFIED="1638510791086" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Main_PYQT5.coverage" NAME="Main PYQT5 Coverage Results" MODIFIED="1638564302896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

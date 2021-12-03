@@ -68,7 +68,6 @@ api.dataset_download_file(dataset, 'Admission_Predict.csv', path)
 class CorrelationPlot(QMainWindow):
     # ;:-----------------------------------------------------------------------
     # This class creates a canvas to draw a correlation plot
-    # It presents all the features plus the happiness score
     # the methods for this class are:
     #   _init_
     #   initUi
@@ -189,9 +188,6 @@ class CorrelationPlot(QMainWindow):
         if self.feature7.isChecked():
             list_corr_features = pd.concat([list_corr_features, per_new[features_list[7]]], axis=1)
 
-        vsticks = ["dummy"]
-        vsticks1 = list(list_corr_features.columns)
-        vsticks1 = vsticks + vsticks1
         res_corr = list_corr_features.corr()
         sns.heatmap(res_corr,annot=True,cbar=False, ax=self.ax1)
 
@@ -1013,7 +1009,7 @@ class Regression(QMainWindow):
 class AdmitGraphs(QMainWindow):
     #::---------------------------------------------------------
     # This class crates a canvas with a plot to show the relation
-    # from each feature in the dataset with the happiness score
+    # from each feature in the dataset with the chance of admission
     # methods
     #    _init_
     #   update
@@ -1263,6 +1259,13 @@ class App(QMainWindow):
         # Linear Regression
         #       Decision Tree
         #       Random Forest
+        #::------------------------------------------------------
+        # Cross Validation
+        #::------------------------------------------------------
+        MLModel3Button = QAction(QIcon('pty.png'), 'Cross Validation', self)
+        MLModel3Button.setStatusTip('Cross Validation')
+        MLModelMenu.addAction(MLModel3Button)
+        MLModel3Button.triggered.connect(self.MLS)
         #::--------------------------------------------------
         # Decision Tree Model
         #::--------------------------------------------------
@@ -1279,13 +1282,7 @@ class App(QMainWindow):
         MLModel2Button.setStatusTip('Decision Tree Regression')
         MLModelMenu.addAction(MLModel2Button)
         MLModel2Button.triggered.connect(self.MLDT)
-        #::------------------------------------------------------
-        # Cross Validation
-        #::------------------------------------------------------
-        MLModel3Button = QAction(QIcon('pty.png'), 'Cross Validation', self)
-        MLModel3Button.setStatusTip('Cross Validation')
-        MLModelMenu.addAction(MLModel3Button)
-        MLModel3Button.triggered.connect(self.MLS)
+
 
         #::------------------------------------------------------
         # Random Forest Classifier
