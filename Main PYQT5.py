@@ -193,10 +193,7 @@ class CorrelationPlot(QMainWindow):
         vsticks1 = list(list_corr_features.columns)
         vsticks1 = vsticks + vsticks1
         res_corr = list_corr_features.corr()
-        self.ax1.matshow(res_corr, cmap=plt.cm.get_cmap('autumn', 14))
-        # self.fig.colorbar(self.ax1.matshow(res_corr, cmap="summer"))
-        self.ax1.set_yticklabels(vsticks1)
-        self.ax1.set_xticklabels(vsticks1, rotation=90)
+        sns.heatmap(res_corr,annot=True,cbar=False, ax=self.ax1)
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
