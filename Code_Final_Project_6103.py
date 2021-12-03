@@ -25,6 +25,7 @@ from sklearn import tree
 from sklearn.tree import export_graphviz
 import os
 from pydotplus import graph_from_dot_data
+from sklearn.ensemble import VotingRegressor
 import webbrowser
 
 #--
@@ -83,6 +84,15 @@ for e in range(1,7):
     print(np.where(item>upper) or np.where(item<lower)) ## shows in which array the outlier appears
     n += 1
 
+# per_new=per[(per.iloc[:,-1]>=0.01)&(per.iloc[:,-1]<=1)] #Chance of Admission
+# per_new=per[(per.iloc[:,1]>=1)&(per.iloc[:,1]<=340)] #GRE
+# per_new=per[(per.iloc[:,2]>=1)&(per.iloc[:,2]<=120)] #TOEFL
+# per_new=per[(per.iloc[:,3]>=1)&(per.iloc[:,3]<=5)] #URating
+# per_new=per[(per.iloc[:,4]>=1)&(per.iloc[:,4]<=5)] #SOP
+# per_new=per[(per.iloc[:,5]>=1)&(per.iloc[:,5]<=5)] #LOR
+# per_new=per[(per.iloc[:,6]>=1)&(per.iloc[:,6]<=10)] #CGPA
+# per_new=per[(per.iloc[:,7]>=0)&(per.iloc[:,7]<=1)] #Research
+
 #Checking for Outliers for categoricals
 
 per_new['University Rating'].unique()
@@ -100,8 +110,7 @@ sns.jointplot(x=per_new['GRE Score'],y=per_new['Chance of Admit'],hue=per_new['U
 sns.jointplot(x=per_new['TOEFL Score'],y=per_new['Chance of Admit'],hue=per_new['Research']);plt.show()
 sns.jointplot(x=per_new['TOEFL Score'],y=per_new['Chance of Admit'],hue=per_new['University Rating']);plt.show()
 sns.boxplot(x=per_new['Chance of Admit'],whis=np.inf); plt.show()
-sns.boxplot(x=per_new['Research'],y=per_new['Chance of Admit'],hue=per_new['University Rating']); plt.show()
-#--As CGPA and GRE increases, chance of admission increases also.
+ #--As CGPA and GRE increases, chance of admission increases also.
 
 #American dream selector
 z=per_new.describe()
@@ -339,6 +348,7 @@ importances = importances.sort_values(by='Importance', ascending=False)
 plt.bar(x=importances['Attribute'], height=importances['Importance'], color='#087E8B')
 plt.title('Feature importances obtained from coefficients', size=20)
 plt.xticks(rotation='vertical')
+plt.tight_layout()
 plt.show()
 
 
@@ -360,6 +370,15 @@ plt.show()
 score2=lr.score(X_test,y_test)
 print(f'Linear Regression Model Score: {np.round(score2,6)}%')
 
+## VOTING REGRESSOR
+
+model_1 = LinearRegression()
+model_2 = RandomForestRegressor(n_estimators= 80,min_samples_split = 2,min_samples_leaf = 1,max_features = 'sqrt',max_depth = 10,bootstrap = True)
+model_3 = DecisionTreeRegressor(max_depth=5,random_state=10)
+voting_essemble = VotingRegressor(estimators=[('lr', model_1), ('rf', model_2),('dt',model_3)])
+voting_essemble.fit(X_train,y_train)
+
+print('Voting Essemble Score: ',voting_essemble.score(X_test,y_test))
 
 
 
