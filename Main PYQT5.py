@@ -1021,7 +1021,7 @@ class AdmitGraphs(QMainWindow):
         # Crate a canvas with the layout to draw a plot
         super(AdmitGraphs, self).__init__()
 
-        self.Title = "Features vrs Admit Chance"
+        self.Title = "Features vs Admit Chance"
         self.main_widget = QWidget(self)
 
         self.setWindowTitle(self.Title)
