@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="5f092a3f-e73e-401b-b984-ae9823d8adcf" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Code_Final_Project_6103.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code_Final_Project_6103.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main PYQT5.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main PYQT5.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -174,9 +175,9 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Main_PYQT5.coverage" NAME="Main PYQT5 Coverage Results" MODIFIED="1638628341602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Code_Final_Project_6103.coverage" NAME="Code_Final_Project_6103 Coverage Results" MODIFIED="1636848181792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Code_Final.coverage" NAME="Code Final Coverage Results" MODIFIED="1637941023063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Code_Final.coverage" NAME="Code Final Coverage Results" MODIFIED="1638575323053" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$MAIN.coverage" NAME="MAIN Coverage Results" MODIFIED="1637782184935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FINAL_PROJECT_GROUP4$Main_PYQT5.coverage" NAME="Main PYQT5 Coverage Results" MODIFIED="1638564302896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
