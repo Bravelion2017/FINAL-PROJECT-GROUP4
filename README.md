@@ -43,6 +43,7 @@ Note: Using Anaconda environment saves the stress of the above apart from those 
 
 Description of files:
 
+
 Code PYQT5.py is the python file that contains all the code for the demo including the GUI.
 
 Code No GUi is the python file which contains all the code with more data visualization and more models but no GUI included.
