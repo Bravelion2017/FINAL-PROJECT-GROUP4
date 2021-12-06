@@ -423,7 +423,7 @@ class DecisionTree(QMainWindow):
 
         # MSE
         self.mse = mean_squared_error(y_test, y_pred)
-        self.txtR3.setText(str(np.round(self.mse * 100, 4)) + '%')
+        self.txtR3.setText(str(np.round(self.mse, 4)))
 
         # Feature importance
         feature_names = self.list_corr_features.columns
@@ -673,7 +673,7 @@ class RandomForest(QMainWindow):
         self.txtR2.setText(str(np.round(self.r2 * 100)) + '%')
         # MSE
         self.mse = mean_squared_error(y_test, y_pred)
-        self.txtR3.setText(str(np.round(self.mse * 100, 4)) + '%')
+        self.txtR3.setText(str(np.round(self.mse, 4)) )
 
         # Feature importance
         feature_names = ['GRE', 'TOEFL', 'URating', 'SOP', 'LOR', 'CGPA', 'Research']
