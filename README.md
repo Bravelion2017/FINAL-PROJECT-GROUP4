@@ -2,7 +2,7 @@
 
 PREDICTIVE MODELING FOR CHANCE OF ADMISSION
 
-The Main PYQT5.py shows graphics for an EDA Analysis, as well as the results of three machine learning algorithms based on the chance of admission data set. The research's aim is to build a regression model that best predicts the chance of admission for graduate students and obtain feature importance.
+The Code PYQT5.py shows graphics for an EDA Analysis, as well as the results of three machine learning algorithms based on the chance of admission data set. The research's aim is to build a regression model that best predicts the chance of admission for graduate students and obtain feature importance.
 
 Code Order: The code is built from bottom to top for a more efficient GUI code readability. 
 
