@@ -100,7 +100,8 @@ per_new['Research'].unique()
 
 # Visualization
 sns.heatmap(per.corr(), annot=True, cmap='summer')
-plt.title("Correlation on Admission Features");
+plt.title("Correlation on Admission Features")
+plt.tight_layout()
 plt.show()
 # ---------
 sns.jointplot(x=per_new['CGPA'], y=per_new['Chance of Admit']);
@@ -380,12 +381,14 @@ pred2 = lr.predict(X_test)
 lr_pred = pd.DataFrame({'y_test': y_test, 'y_pred': pred2})
 sns.kdeplot(data=lr_pred, x='y_test', label='Actual', color='olive')
 sns.kdeplot(data=lr_pred, x='y_pred', label='Predicted', color='teal')
-sns.scatterplot(lr_pred['y_test'], lr_pred['y_pred'], color='blue')
+#sns.scatterplot(lr_pred['y_test'], lr_pred['y_pred'], color='blue')
 plt.xlabel("Chance of Admit")
 plt.legend()
 plt.show()
 score2 = lr.score(X_test, y_test)
 print(f'Linear Regression Model Score: {np.round(score2, 6)}%')
+
+
 
 ## VOTING REGRESSOR
 
