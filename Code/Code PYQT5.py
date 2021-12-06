@@ -230,7 +230,7 @@ class DecisionTree(QMainWindow):
 
         self.layout = QGridLayout(self.main_widget)
 
-        self.groupBox1 = QGroupBox('ML Linear Regression Features')
+        self.groupBox1 = QGroupBox('ML Decision Tree Regression Features')
         self.groupBox1Layout = QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 

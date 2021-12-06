@@ -43,8 +43,10 @@ Note: Using Anaconda environment saves the stress of the above apart from those 
 
 Description of files:
 
-Main PYQT5.py is the python file that contains all the code for the demo including the GUI.
 
+Code PYQT5.py is the python file that contains all the code for the demo including the GUI.
+
+Code No GUi is the python file which contains all the code with more data visualization and more models but no GUI included.
 
 Pty.png , enter.png, racoon.png are icons that are used in the menu items in the application.
 
