@@ -131,7 +131,7 @@ per['Admitted'] = per.iloc[:, -1].apply(lambda x: 0 if x < per.iloc[:, -1].mean(
 x, y = per_new.drop(['Chance of Admit', 'GRE Groups', 'TOEFL Groups'], axis=1), per_new['Chance of Admit']
 # The algorithm model that is going to learn from our data to make predictions
 # splitting the data 80:20
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.20)
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.20, random_state=4)
 
 # Cross Validation to identify best model CONSTANT
 models = ['Linear Reg', 'Decision Tree Reg', 'Random Forest Reg', 'Gradient Boosting Reg', 'Ada Boosting Reg',
@@ -206,7 +206,7 @@ rf_improve.score(X_test, y_test)
 rf_improve.best_params_
 # After performing the randomized search we got the parameters it got and put it in our random forest method
 rf = RandomForestRegressor(n_estimators=80, min_samples_split=2, min_samples_leaf=1, max_features='sqrt', max_depth=10,
-                           bootstrap=True)
+                           bootstrap=True,random_state=10)
 rf.fit(X_train, y_train)
 rf.score(X_test, y_test)
 
@@ -235,8 +235,10 @@ webbrowser.open_new(r'random_forest.pdf')
 from sklearn import metrics
 
 print(f'Random Forest Regressor Score: {np.round(rf.score(X_test, y_test), 2) * 100}%')
-print('Root Mean Squared Error:', np.sqrt(mean_squared_error(y_test, y_pred)))
-print('Mean Squared Error:', mean_squared_error(y_test, y_pred))
+print('RF Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+print('RF Mean Squared Error:', mean_squared_error(y_test, y_pred))
+print('RF Root Mean Squared Error:', np.sqrt(mean_squared_error(y_test, y_pred)))
+
 
 ##Putting our Randomizedsesearch into a datafram to check any trends
 results = pd.DataFrame(rf_improve.cv_results_)
@@ -311,10 +313,12 @@ plt.show()
 from sklearn import metrics
 
 score = regressor.score(X_test, y_test)
-print(f'DecisionTree Regressor Score: {np.round(score, 2) * 100}%')
-print('Mean Absolute Error:', np.round(metrics.mean_absolute_error(y_test, pred), 4))
-print('Mean Squared Error:', np.round(metrics.mean_squared_error(y_test, pred), 4))
-print('Root Mean Squared Error:', np.round(np.sqrt(metrics.mean_squared_error(y_test, pred)), 4))
+print(f'DecisionTree Regressor Score: {np.round(score, 3) * 100}%')
+print('DT Mean Absolute Error:', metrics.mean_absolute_error(y_test, pred))
+print('DT Mean Squared Error:', metrics.mean_squared_error(y_test, pred))
+print('DT Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+
+
 
 # Decision Tree's Tree
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
@@ -355,9 +359,15 @@ new_y_test = scaler.fit_transform(y_test.values.reshape(-1, 1))
 
 # new_X_train = scaler.fit_transform(X_train)
 # new_X_test = scaler.fit_transform(X_test)
-
 lr.fit(new_X_train, new_y_train)
+
+pred1 = lr.predict(new_X_test)
+
 print('Linear Regression Scaling Regression: ', lr.score(new_X_test, new_y_test))
+print('LR Mean Absolute Error:', metrics.mean_absolute_error(pred1, new_y_test))
+print('LR Mean Squared Error:', metrics.mean_squared_error(pred1, new_y_test))
+print('LR Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(pred1, new_y_test)))
+
 
 importances = pd.DataFrame(data={
     'Attribute': new_X_train.columns,
@@ -386,8 +396,10 @@ plt.xlabel("Chance of Admit")
 plt.legend()
 plt.show()
 score2 = lr.score(X_test, y_test)
-print(f'Linear Regression Model Score: {np.round(score2, 6)}%')
-
+print(f'Linear Regression Model Score: {np.round(score2, 3)*100}%')
+print('LR Mean Absolute Error:', metrics.mean_absolute_error(y_test, pred2))
+print('LR Mean Squared Error:', metrics.mean_squared_error(y_test, pred2))
+print('LR Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, pred2)))
 
 
 ## VOTING REGRESSOR
@@ -395,7 +407,7 @@ print(f'Linear Regression Model Score: {np.round(score2, 6)}%')
 model_1 = LinearRegression()
 model_2 = RandomForestRegressor(n_estimators=80, min_samples_split=2, min_samples_leaf=1, max_features='sqrt',
                                 max_depth=10, bootstrap=True)
-model_3 = DecisionTreeRegressor(max_depth=5, random_state=10)
+model_3 = DecisionTreeRegressor(max_depth=5)
 voting_essemble = VotingRegressor(estimators=[('lr', model_1), ('rf', model_2), ('dt', model_3)])
 voting_essemble.fit(X_train, y_train)
 
